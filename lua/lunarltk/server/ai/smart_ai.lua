@@ -1,11 +1,5 @@
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
---[[
-
-一套基于收益论和简易收益预测的AI框架
-
---]]
-
 --- 卡牌对于AI的价值
 fk.ai_card_keep_value = {}
 
@@ -16,13 +10,13 @@ fk.ai_card_keep_value = {}
 local SmartAI = TrustAI:subclass("SmartAI")
 
 local require_skill = require "lunarltk.server.ai.skill"
-SkillAI, TriggerSkillAI = require_skill[1], require_skill[2]
+local SkillAI, TriggerSkillAI = require_skill[1], require_skill[2]
 local AIUtil = require 'lunarltk.server.ai.util'
 SmartAI:include(AIUtil)
 
 ---@type table<string, AIGameEvent>
 fk.ai_events = {}
-AIGameLogic, AIGameEvent = require "lunarltk.server.ai.logic"
+local AIGameLogic, AIGameEvent = require "lunarltk.server.ai.logic"
 
 function SmartAI:initialize(player)
   TrustAI.initialize(self, player)
@@ -65,6 +59,7 @@ fk.ai_skills = {}
 ---@param spec? SkillAISpec
 ---@param inherit? string
 function SmartAI.static:setSkillAI(key, spec, inherit)
+  do return end
   if not fk.ai_skills[key] then
     fk.ai_skills[key] = SkillAI:new(key)
   end
@@ -125,6 +120,7 @@ end
 ---@param key string
 ---@param spec? SkillAISpec 表
 ---@param inherit? string 可以直接复用某个技能已有的函数 自然spec中更加优先
+---@deprecated
 ---@diagnostic disable-next-line
 function SmartAI:setSkillAI(key, spec, inherit)
   error("This is a static method. Please use SmartAI:setSkillAI(...)")
@@ -190,6 +186,7 @@ SmartAI:setSkillAI("__card_skill", {
 })
 
 function SmartAI.static:setCardSkillAI(key, spec, key2)
+  do return end
   SmartAI:setSkillAI(key, spec, "__card_skill")
   if key2 then
     SmartAI:setSkillAI(key, spec, key2)
@@ -200,6 +197,7 @@ end
 ---@param key string
 ---@param spec? SkillAISpec 表
 ---@param key2? string 要继承的
+---@deprecated
 function SmartAI:setCardSkillAI(key, spec, key2)
   error("This is a static method. Please use SmartAI:setCardSkillAI(...)")
 end
@@ -268,6 +266,7 @@ fk.ai_trigger_skills = {}
 
 ---@param spec TriggerSkillAISpec
 function SmartAI.static:setTriggerSkillAI(key, spec)
+  do return end
   if not fk.ai_trigger_skills[key] then
     fk.ai_trigger_skills[key] = TriggerSkillAI:new(key)
   end
@@ -280,6 +279,7 @@ end
 --- 将spec中的键值保存到这个技能的ai中
 ---@param key string
 ---@param spec TriggerSkillAISpec
+---@deprecated
 ---@diagnostic disable-next-line
 function SmartAI:setTriggerSkillAI(key, spec)
   error("This is a static method. Please use SmartAI:setTriggerSkillAI(...)")
