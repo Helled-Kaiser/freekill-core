@@ -86,6 +86,13 @@ function Engine:initialize()
   self.choose_general_rule = {}
   self.skin_packages = {}
 
+  self.Ltk = {
+    AIStrategy = require 'lunarltk.server.ai.strategy',
+
+    AI = require 'lunarltk.server.ai.strategies',
+    -- AuxAI = require 'lunarltk.server.ai.strategies',
+  }
+
   self:loadPackages()
 
   -- 唉，杀批的Engine又搞特殊了

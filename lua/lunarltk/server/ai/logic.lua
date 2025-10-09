@@ -93,7 +93,7 @@ end
 ---@param info MoveInfo
 function AIGameLogic:applyMoveInfo(data, info)
   local benefit = 0
-  local card_value = fk.ai_card_keep_value[Fk:getCardById(info.cardId).name] or 100
+  local card_value = 100 --fk.ai_card_keep_value[Fk:getCardById(info.cardId).name] or 100
 
   if data.from then
     if info.fromArea == Player.Hand then
@@ -111,7 +111,7 @@ function AIGameLogic:applyMoveInfo(data, info)
     if data.moveReason == fk.ReasonUse then
       -- benefit = benefit / 10
       -- 当没写卡牌生效的ai时，随机出牌
-      benefit = -0.5 - math.random()
+      benefit = 0.5 - math.random()
     end
     self.benefit = self.benefit + benefit
     benefit = 0
@@ -181,7 +181,6 @@ end
 ---@class AIGameEvent.ChangeHp : AIGameEvent
 ---@field public data HpChangedData
 local ChangeHp = AIGameEvent:subclass("AIGameEvent.ChangeHp")
-fk.ai_events.ChangeHp = ChangeHp
 function ChangeHp:exec()
   local logic = self.logic
   local data = self.data
@@ -211,7 +210,6 @@ function AIGameLogic:changeHp(player, num, reason, skillName, damageData)
 end
 
 local Damage = AIGameEvent:subclass("AIGameEvent.Damage")
-fk.ai_events.Damage = Damage
 function Damage:exec()
   local logic = self.logic
   local damageData = self.data
@@ -274,7 +272,6 @@ function AIGameLogic:damage(damageData)
 end
 
 local LoseHp = AIGameEvent:subclass("AIGameEvent.LoseHp")
-fk.ai_events.LoseHp = LoseHp
 function LoseHp:exec()
   local data = self.data
   local room = self.room
@@ -318,7 +315,6 @@ end
 ---@class AIGameEvent.Recover : AIGameEvent
 ---@field public data RecoverData
 local Recover = AIGameEvent:subclass("AIGameEvent.Recover")
-fk.ai_events.Recover = Recover
 function Recover:exec()
   local RecoverData = self.data
   local logic = self.logic
@@ -354,7 +350,6 @@ end
 -- skill.lua
 
 local SkillEffect = AIGameEvent:subclass("AIGameEvent.SkillEffect")
-fk.ai_events.SkillEffect = SkillEffect
 function SkillEffect:exec()
   local logic = self.logic
   local data = self.data
@@ -378,7 +373,6 @@ end
 
 -- movecard.lua
 local MoveCards = AIGameEvent:subclass("AIGameEvent.MoveCards")
-fk.ai_events.MoveCards = MoveCards
 function MoveCards:exec()
   local logic = self.logic
   local moveCardsData = self.data
@@ -473,13 +467,12 @@ end
 -- usecard.lua
 
 local UseCard = AIGameEvent:subclass("AIGameEvent.UseCard")
-fk.ai_events.UseCard = UseCard
 function UseCard:exec()
   local logic = self.logic
   local useCardData = self.data
 
   if useCardData and useCardData.card and useCardData.card.skill then
-    local skill_ai = fk.ai_skills[useCardData.card.skill.name]
+    local skill_ai = self.ai:findStrategyOfSkill(Fk.Ltk.AI.CardSkillStrategy, useCardData.card.skill.name)
     if skill_ai then skill_ai:onUse(logic, useCardData) end
   end
 
@@ -529,7 +522,6 @@ end
 AIGameLogic.doCardUseEffect = GameEventWrappers.doCardUseEffect
 
 local CardEffect = AIGameEvent:subclass("AIGameEvent.CardEffect")
-fk.ai_events.CardEffect = CardEffect
 function CardEffect:exec()
   local cardEffectData = self.data
   local room = self.room
@@ -596,7 +588,7 @@ function AIGameLogic:handleCardEffect(event, cardEffectEvent)
         skill = cardEffectEvent.card.skill,
         skill_cb = function()
           local skill = cardEffectEvent.card.skill
-          local ai = fk.ai_skills[skill.name]
+          local ai = self.ai:findStrategyOfSkill(Fk.Ltk.AI.CardSkillStrategy, skill.name)
           if ai then
             ai:onEffect(self, cardEffectEvent)
           end
@@ -611,7 +603,6 @@ end
 -- judge.lua
 
 local Judge = AIGameEvent:subclass("AIGameEvent.Judge")
-fk.ai_events.Judge = Judge
 function Judge:exec()
   local data = self.data
   local logic = self.logic

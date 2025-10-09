@@ -43,9 +43,6 @@ skill:addEffect("cardskill", {
   end,
 })
 
-skill:addAI(nil, "__card_skill")
-skill:addAI(nil, "default_card_skill")
-
 skill:addTest(function(room, me)
   local comp2 = room.players[2]
   local card = room:printCard("jink")

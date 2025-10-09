@@ -52,7 +52,7 @@ skill:addEffect("cardskill", {
   end,
 })
 
-skill:addAI({
+skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
   on_effect = function(self, logic, effect)
     logic:damage({
       from = effect.from,
@@ -63,7 +63,7 @@ skill:addAI({
       skillName = skill.name
     })
   end,
-}, "__card_skill")
+})
 
 skill:addTest(function(room, me)
   local slash = Fk:getCardById(1)
