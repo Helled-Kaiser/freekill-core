@@ -471,6 +471,21 @@ function UseCard:exec()
   local logic = self.logic
   local useCardData = self.data
 
+  -- add fix targets to usedata in place of card.skill:onUse
+  if #useCardData.tos == 0 then
+    local fix_targets = useCardData.card:getFixedTargets(useCardData.from, useCardData.extra_data)
+    if fix_targets then
+      if useCardData.card.skill then
+        for _, p in ipairs(fix_targets) do
+          if useCardData.card.skill:modTargetFilter(useCardData.from, p, {}, useCardData.card, useCardData.extra_data)
+            and not useCardData.from:isProhibited(p, useCardData.card) then
+            useCardData:addTarget(p)
+          end
+        end
+      end
+    end
+  end
+
   if useCardData and useCardData.card and useCardData.card.skill then
     local skill_ai = self.ai:findStrategyOfSkill(Fk.Ltk.AI.CardSkillStrategy, useCardData.card.skill.name)
     if skill_ai then skill_ai:onUse(logic, useCardData) end

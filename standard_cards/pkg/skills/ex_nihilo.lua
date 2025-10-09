@@ -14,7 +14,7 @@ skill:addEffect("cardskill", {
 
 skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
   on_effect = function(self, logic, effect)
-    effect.to:drawCards(2, skill.name)
+    logic:drawCards(effect.to, 2, skill.name)
   end,
 })
 
