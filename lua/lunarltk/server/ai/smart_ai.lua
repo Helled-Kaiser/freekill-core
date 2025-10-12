@@ -213,18 +213,20 @@ function SmartAI:handleAskForSkillInvoke(data)
     return ""
   end
 end
---[==[
+
 function SmartAI:handleAskForChoice(data)
   local choices, allChoices, skillName, prompt = table.unpack(data)
-  local ai = fk.ai_skills[skillName]
+  local ai = self:findStrategyOfSkill(AI.ChoiceStrategy, skillName)
   if ai then
-    local ret = ai:thinkForChoice(self, choices, prompt, allChoices)
-    return ret
+    verbose(1, "正在询问技能：%s, 可选选项列表：%s", ai.skill_name, table.concat(choices, "+"))
+    local ret, real_val = ai:makeReply(self)
+    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
+    return ret or choices[1]
   else
     return choices[1]
   end
 end
-
+--[==[
 function SmartAI:handleAskForUseCard(data)
   local card_ids = self:getEnabledCards()
   local pattern = data[2]
