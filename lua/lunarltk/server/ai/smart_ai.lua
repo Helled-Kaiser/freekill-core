@@ -189,17 +189,17 @@ end
 -- SkillAI里面每个command给个方法
 -- ========================================
 
---[==[
 function SmartAI:handleAskForCardChosen(data)
   local target_id, flag, reason, prompt = table.unpack(data)
   local target = self.room:getPlayerById(target_id)
-  local ai = fk.ai_skills[reason]
+  local ai = self:findStrategyOfSkill(AI.CardChosenStrategy, reason)
   if ai then
-    local ret = ai:thinkForCardChosen(self, target, flag, prompt)
+    verbose(1, "正在询问技能：%s, %s", ai.skill_name, prompt)
+    local ret, real_val = ai:makeReply(self)
+    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
     return ret
   end
 end
---]==]
 
 function SmartAI:handleAskForSkillInvoke(data)
   local skillName, prompt = data[1], data[2]
