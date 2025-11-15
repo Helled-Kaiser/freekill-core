@@ -6,6 +6,7 @@ import QtQuick.Dialogs
 
 import Fk
 import Fk.Components.Common
+import Fk.Components.GameCommon
 import Fk.Widgets as W
 import Fk.Pages.Lobby as L
 
@@ -62,7 +63,7 @@ Item {
 
     Text {
       anchors.centerIn: parent
-      text: Lua.tr("Click The Game Scene to back")
+      text: Config.headerName !== "" ? Config.headerName : Lua.tr("Click The Game Scene to back")
       font.pixelSize: 16
     }
   }
@@ -117,9 +118,10 @@ Item {
         }
 
         W.ButtonContent {
+          plainButton: false
           Layout.preferredWidth: 40
           // text: Lua.tr("Speed Down")
-          icon.source: "http://175.178.66.93/symbolic/actions/media-seek-backward-symbolic.svg"
+          icon.source: Cpp.path + "/image/symbolic/actions/media-seek-backward-symbolic.svg"
           onClicked: Backend.controlReplayer("slowdown");
         }
 
@@ -130,19 +132,21 @@ Item {
         }
 
         W.ButtonContent {
+          plainButton: false
           Layout.preferredWidth: 40
           // text: Lua.tr("Speed Up")
-          icon.source: "http://175.178.66.93/symbolic/actions/media-seek-forward-symbolic.svg"
+          icon.source: Cpp.path + "/image/symbolic/actions/media-seek-forward-symbolic.svg"
           onClicked: Backend.controlReplayer("speedup");
         }
 
         W.ButtonContent {
+          plainButton: false
           property bool running: true
           Layout.preferredWidth: 40
           // text: Lua.tr(running ? "Pause" : "Resume")
           icon.source: running ?
-            "http://175.178.66.93/symbolic/actions/media-playback-pause-symbolic.svg" :
-            "http://175.178.66.93/symbolic/actions/media-playback-start-symbolic.svg"
+            Cpp.path + "/image/symbolic/actions/media-playback-pause-symbolic.svg" :
+            Cpp.path + "/image/symbolic/actions/media-playback-start-symbolic.svg"
           onClicked: {
             running = !running;
             Backend.controlReplayer("toggle");
@@ -163,8 +167,9 @@ Item {
 
     W.ButtonContent {
       id: quitButton
+      plainButton: false
       text: Lua.tr("Quit")
-      icon.source: "http://175.178.66.93/symbolic/actions/application-exit-rtl-symbolic.svg"
+      icon.source: Cpp.path + "/image/symbolic/actions/application-exit-rtl-symbolic.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -174,8 +179,9 @@ Item {
 
     W.ButtonContent {
       id: volumeButton
+      plainButton: false
       text: Lua.tr("Settings")
-      icon.source: "http://175.178.66.93/symbolic/categories/applications-system-symbolic.svg"
+      icon.source: Cpp.path + "/image/symbolic/categories/applications-system-symbolic.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -185,8 +191,9 @@ Item {
 
     W.ButtonContent {
       id: banSchemaButton
+      plainButton: false
       text: Lua.tr("Info")
-      icon.source: "http://175.178.66.93/symbolic/mimetypes/x-office-document-symbolic.svg"
+      icon.source: Cpp.path + "/image/symbolic/mimetypes/x-office-document-symbolic.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -197,6 +204,7 @@ Item {
 
     W.ButtonContent {
       id: surrenderButton
+      plainButton: false
       enabled: !Config.observing && !Config.replaying
       text: Lua.tr("Surrender")
       icon.source: Cpp.path + "/image/misc/surrender"
@@ -225,8 +233,9 @@ Item {
 
     W.ButtonContent {
       id: generalButton
+      plainButton: false
       text: Lua.tr("Generals Overview")
-      icon.source: "http://175.178.66.93/symbolic/mimetypes/inode-directory-symbolic.svg"
+      icon.source: "http://175.178.66.93/symbolic/lunarltk/jiang.png"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -238,8 +247,9 @@ Item {
 
     W.ButtonContent {
       id: cardslButton
+      plainButton: false
       text: Lua.tr("Cards Overview")
-      icon.source: "http://175.178.66.93/symbolic/mimetypes/inode-directory-symbolic.svg"
+      icon.source: "http://175.178.66.93/symbolic/lunarltk/cards.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -251,8 +261,9 @@ Item {
 
     W.ButtonContent {
       id: modesButton
+      plainButton: false
       text: Lua.tr("Modes Overview")
-      icon.source: "http://175.178.66.93/symbolic/categories/applications-games-symbolic.svg"
+      icon.source: Cpp.path + "/image/symbolic/categories/applications-games-symbolic.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -267,8 +278,9 @@ Item {
 
     W.ButtonContent {
       id: chatButton
+      plainButton: false
       text: Lua.tr("Chat")
-      icon.source: "http://175.178.66.93/symbolic/actions/chat-message-new-symbolic.svg"
+      icon.source: Cpp.path + "/image/symbolic/actions/chat-message-new-symbolic.svg"
       font.bold: true
       Layout.fillWidth: true
       onClicked: {
@@ -397,7 +409,7 @@ Item {
     //   fillMode: Image.PreserveAspectCrop
     // }
 
-    RoomMeadiaBg {
+    MediaArea {
       source: Config.roomBg
       anchors.fill: parent
       fillMode: Image.PreserveAspectCrop

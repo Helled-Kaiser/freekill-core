@@ -26,6 +26,7 @@ Fk:loadTranslationTable {
 
   ["UI settings"] = "UI设置",
   ["No available UI package"] = "无可用UI",
+  ["Game UI settings"] = "游戏UI设置",
   ["lunarltk"] = "新月杀",
   ["default"] = "默认",
   ["UI packages select"] = "设置UI",
@@ -96,6 +97,7 @@ Fk:loadTranslationTable {
   ["Full"] = "已满",
   ["Not Full"] = "未满",
   ["Room Capacity"] = "人数上限",
+  ["Change Room Config"] = "房间配置",
   ["Add Robot"] = "添加机器人",
   ["Start Game"] = "开始游戏",
   ["Ready"] = "准备",
@@ -281,7 +283,9 @@ FreeKill使用的是libgit2的C API，与此同时使用Git完成拓展包的下
 
   ["BanGeneral"] = "禁将",
   ["ResumeGeneral"] = "解禁",
+  ["Enabled Status"] = "启用状态",
   ["Enable"] = "启用",
+  ["Disabled"] = "禁用",
   ["Prohibit"] = "禁",
   ["BanPackage"] = "禁拓展包",
   ["$BanPkgHelp"] = "正在禁用拓展包",
@@ -305,6 +309,7 @@ FreeKill使用的是libgit2的C API，与此同时使用Git完成拓展包的下
   ["Copy Audio Text"] = "复制语音文本",
 
   ["$WelcomeToLobby"] = "欢迎进入新月杀游戏大厅！",
+  ["Current room: %1"] = "当前房间：%1",
   ["GameMode"] = "游戏模式：",
   ["LuckCardNum"] = "手气卡次数：",
   ["ResponseTime"] = "出手时间：",

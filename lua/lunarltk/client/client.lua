@@ -51,6 +51,7 @@ function Client:initialize(_client)
   self:addCallback("RemoveVirtualEquip", self.removeVirtualEquip)
   self:addCallback("ChangeSelf", self.changeSelf)
   self:addCallback("UpdateQuestSkillUI", self.updateQuestSkillUI)
+  self:addCallback("UpdateMarkArea", self.UpdateMarkArea)
   self:addCallback("PrintCard", self.handlePrintCard)
   self:addCallback("AddBuddy", self.addBuddy)
   self:addCallback("RmBuddy", self.rmBuddy)
@@ -69,6 +70,19 @@ end
 
 function Client:enterRoom(_data)
   ClientBase.enterRoom(self, _data)
+  self = ClientInstance
+
+  local data = _data[3]
+  table.insertTableIfNeed(
+    data.disabledPack,
+    Fk.game_mode_disabled[data.gameMode] or Util.DummyTable
+  )
+  self.disabled_packs = data.disabledPack
+  self.disabled_generals = data.disabledGenerals
+end
+
+function Client:changeRoom(_data)
+  ClientBase.changeRoom(self, _data)
   self = ClientInstance
 
   local data = _data[3]
@@ -868,6 +882,14 @@ function Client:updateQuestSkillUI(data)
   updateLimitSkill(playerId, Fk.skills[skillName])
 end
 
+function Client:UpdateMarkArea(data)
+  local player = ClientInstance:getPlayerById(data.id)
+  for key, value in pairs(data.change) do
+    player.markArea[key] = value
+  end
+  self:notifyUI("UpdateMarkArea", data)
+end
+
 function Client:handlePrintCard(data)
   local n, s, num = table.unpack(data)
   AbstractRoom.printCard(self, n, s, num)
@@ -933,3 +955,5 @@ function Client:sendDataToUI(data)
 
   self:notifyUI("UpdateRoundNum", data.round_count)
 end
+
+return Client

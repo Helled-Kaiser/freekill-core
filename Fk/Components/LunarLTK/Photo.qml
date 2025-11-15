@@ -510,6 +510,13 @@ PhotoBase {
     limitSkills.update(skill, time);
   }
 
+  function handleMarkAreaUpdate(data) {
+    if (data.visible !== undefined) {
+      picMarkAreaItem.visible = data.visible;
+      markAreaItem.visible = data.visible;
+    }
+  }
+
   function showDetail() {
     if (playerid === 0 || playerid === -1) {
       return;
