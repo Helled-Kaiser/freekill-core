@@ -52,27 +52,24 @@ RoomScene.unselectAllTargets = RoomScene.unselectOtherTargets
 -- 若所有角色都不可选则将state设为normal; 反之只要有可选的就设candidate
 -- 这样更美观
 function RoomScene:updateTargetEnability(pid, enabled)
+  self:update("Photo", pid, {
+    enabled = not not enabled,
+    state = "candidate"
+  })
+end
+
+function RoomScene:allDisabledCheck()
   local photoTab = self.items["Photo"]
-  local photo = photoTab[pid]
-  self:update("Photo", pid, { enabled = not not enabled })
-  if enabled then
-    if photo.state == "normal" then
-      for id, _ in pairs(photoTab) do
-        self:update("Photo", id, { state = "candidate" })
-      end
+  local allDisabled = true
+  for _, v in pairs(photoTab) do
+    if v.enabled then
+      allDisabled = false
+      break
     end
-  else
-    local allDisabled = true
-    for _, v in pairs(photoTab) do
-      if v.enabled then
-        allDisabled = false
-        break
-      end
-    end
-    if allDisabled then
-      for id, _ in pairs(photoTab) do
-        self:update("Photo", id, { state = "normal" })
-      end
+  end
+  if allDisabled then
+    for id, _ in pairs(photoTab) do
+      self:update("Photo", id, { state = "normal" })
     end
   end
 end
