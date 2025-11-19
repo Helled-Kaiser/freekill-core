@@ -334,12 +334,7 @@ end
 --- 更新按钮的状态
 function ReqActiveSkill:updateButtons()
   local scene = self.scene
-  if self:feasible() then
-    scene:update("Button", "OK", { enabled = true })
-    scene:allDisabledCheck()
-  else
-    scene:update("Button", "OK", { enabled = false })
-  end
+  scene:update("Button", "OK", { enabled = self:feasible() })
   scene:update("Button", "Cancel", { enabled = self:isCancelable() })
 end
 

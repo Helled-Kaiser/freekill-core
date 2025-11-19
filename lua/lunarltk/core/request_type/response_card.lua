@@ -115,21 +115,6 @@ function ReqResponseCard:isCancelable()
   return not not self.cancelable
 end
 
---- 更新按钮的状态
-function ReqResponseCard:updateButtons()
-  local scene = self.scene
-  if self:feasible() then
-    scene:update("Button", "OK", { enabled = true })
-    scene:allDisabledCheck()
-  else
-    scene:update("Button", "OK", { enabled = false })
-    if self.skill_name == nil and self.selected_card == nil then
-      scene:disableAllTargets()
-    end
-  end
-  scene:update("Button", "Cancel", { enabled = self:isCancelable() })
-end
-
 function ReqResponseCard:updateSkillButtons()
   local scene = self.scene
   for name, item in pairs(scene:getAllItems("SkillButton")) do

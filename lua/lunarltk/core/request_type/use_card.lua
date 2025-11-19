@@ -156,10 +156,10 @@ function ReqUseCard:selectTarget(playerid, data)
 end
 
 function ReqUseCard:selectSkill(skill, data)
+  ReqResponseCard.selectSkill(self, skill, data)
   self.selected_targets = {}
   self.scene:unselectAllTargets()
   self:updateUnselectedTargets()
-  ReqResponseCard.selectSkill(self, skill, data)
 end
 
 function ReqUseCard:update(elemType, id, action, data)
