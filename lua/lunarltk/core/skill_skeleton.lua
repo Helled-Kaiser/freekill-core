@@ -553,7 +553,6 @@ function SkillSkeleton:createActiveSkill(_skill, idx, key, attr, spec)
   if spec.card_filter then skill.cardFilter = spec.card_filter end
   if spec.target_filter then skill.targetFilter = spec.target_filter end
   if spec.feasible then skill.feasible = spec.feasible end
-  if spec.on_cost then skill.onCost = spec.on_cost end
   if spec.on_use then skill.onUse = spec.on_use end
   if spec.prompt then skill.prompt = spec.prompt end
   if spec.target_tip then skill.targetTip = spec.target_tip end
@@ -702,8 +701,6 @@ function SkillSkeleton:createViewAsSkill(_skill, idx, key, attr, spec)
   else
     skill.mute_card = not (string.find(skill.pattern, "|") or skill.pattern == "." or string.find(skill.pattern, ","))
   end
-
-  if spec.on_cost then skill.onCost = spec.on_cost end
 
   return skill
 end

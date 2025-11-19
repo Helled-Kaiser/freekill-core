@@ -79,6 +79,8 @@ function fk.readUsableSpecToSkill(skill, spec)
   skill.click_count = not not spec.click_count
   skill.history_branch = spec.history_branch
   skill.include_equip = spec.include_equip
+
+  if spec.on_cost then skill.onCost = spec.on_cost end
 end
 
 function fk.readStatusSpecToSkill(skill, spec)
@@ -128,7 +130,8 @@ end
 ---@field public target_filter? fun(self: CardSkill, player: Player?, to_select: Player, selected: Player[], selected_cards: integer[], card?: Card, extra_data: any): any @ 判定目标能否选择
 ---@field public feasible? fun(self: CardSkill, player: Player, selected: Player[], selected_cards: integer[]): any @ 判断卡牌和目标是否符合技能限制
 ---@field public can_use? fun(self: CardSkill, player: Player, card: Card, extra_data: any): any @ 判断卡牌技能否发动
----@field public on_use? fun(self: CardSkill, room: Room, cardUseEvent: UseCardData): any
+---@field public on_use? fun(self: CardSkill, room: Room, cardUseEvent: UseCardData): any @ 实际使用的函数
+---@field public on_cost? fun(self: CardSkill, player: ServerPlayer, data: SkillUseData, extra_data?: UseExtraData|table):CostData|table? @ 自定义技能的消耗信息
 ---@field public fix_targets? fun(self: CardSkill, player: Player, card: Card, extra_data: any): Player[]? @ 设置固定目标
 ---@field public on_action? fun(self: CardSkill, room: Room, cardUseEvent: UseCardData, finished: boolean): any
 ---@field public about_to_effect? fun(self: CardSkill, room: Room, effect: CardEffectData): boolean? @ 生效前判断，返回true则取消效果
@@ -146,7 +149,7 @@ end
 ---@field public feasible? fun(self: ViewAsSkill, player: Player, selected: Player[], selected_cards: integer[], card: Card): any @ 判断卡牌和目标是否符合技能限制
 ---@field public on_use? fun(self: ViewAsSkill, room: Room, skillUseEvent: SkillUseData, card: Card, params: handleUseCardParams?): UseCardDataSpec|string?
 ---@field public view_as fun(self: ViewAsSkill, player: Player, cards: integer[]): Card? @ 判断转化为什么牌
----@field public on_cost? fun(self: ViewAsSkill, player: ServerPlayer, data: SkillUseData, extra_data?: UseExtraData|table):CostData|table @ 自定义技能的消耗信息
+---@field public on_cost? fun(self: ViewAsSkill, player: ServerPlayer, data: SkillUseData, extra_data?: UseExtraData|table):CostData|table? @ 自定义技能的消耗信息
 ---@field public history_branch? string|fun(self: ViewAsSkill, player: ServerPlayer, data: SkillUseData, extra_data?: UseExtraData|table):string? @ 发动技能时增加添加对应某处分支的次数
 ---@field public pattern? string
 ---@field public enabled_at_play? fun(self: ViewAsSkill, player: Player): any
