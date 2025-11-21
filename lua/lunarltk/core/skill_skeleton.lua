@@ -559,6 +559,14 @@ function SkillSkeleton:createActiveSkill(_skill, idx, key, attr, spec)
   if spec.handly_pile then skill.handly_pile = spec.handly_pile end
   if spec.click_count then skill.click_count = spec.click_count end
 
+  if spec.fix_targets then
+    skill.fixTargets = spec.fix_targets
+  elseif spec.target_filter == nil then
+    skill.fixTargets = function()
+      return {}
+    end
+  end
+
   fk.readInteractionToSkill(skill, spec)
   return skill
 end
@@ -613,6 +621,10 @@ function SkillSkeleton:createViewAsSkill(_skill, idx, key, attr, spec)
     end
   else
     skill.filterPattern = spec.filter_pattern
+  end
+
+  if spec.fix_targets then
+    skill.fixTargets = spec.fix_targets
   end
 
   if spec.target_filter then skill.targetFilter = spec.target_filter end

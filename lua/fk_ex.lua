@@ -124,6 +124,7 @@ end
 ---@field public handly_pile? boolean @ 是否能够选择“如手牌使用或打出”的牌
 ---@field public click_count? boolean @ 是否在点击按钮瞬间就计数并播放特效和语音
 ---@field public include_equip? boolean @ 选牌时是否展开装备区
+---@field public fix_targets? fun(self: ActiveSkill, player: Player, selected_cards: integer[], card: Card, extra_data: any): Player[]? @ 设置固定目标
 
 ---@class CardSkillSpec: UsableSkillSpec
 ---@field public mod_target_filter? fun(self: ActiveSkill, player: Player, to_select: Player, selected: Player[], card: Card, extra_data: any): any @ 判定目标是否合法（例如不能杀自己，火攻无手牌目标）
@@ -132,7 +133,7 @@ end
 ---@field public can_use? fun(self: CardSkill, player: Player, card: Card, extra_data: any): any @ 判断卡牌技能否发动
 ---@field public on_use? fun(self: CardSkill, room: Room, cardUseEvent: UseCardData): any @ 实际使用的函数
 ---@field public on_cost? fun(self: CardSkill, player: ServerPlayer, data: SkillUseData, extra_data?: UseExtraData|table):CostData|table? @ 自定义技能的消耗信息
----@field public fix_targets? fun(self: CardSkill, player: Player, card: Card, extra_data: any): Player[]? @ 设置固定目标
+---@field public fix_targets? fun(self: CardSkill, player: Player, selected_cards: integer[], card: Card, extra_data: any): Player[]? @ 设置固定目标
 ---@field public on_action? fun(self: CardSkill, room: Room, cardUseEvent: UseCardData, finished: boolean): any
 ---@field public about_to_effect? fun(self: CardSkill, room: Room, effect: CardEffectData): boolean? @ 生效前判断，返回true则取消效果
 ---@field public on_effect? fun(self: CardSkill, room: Room, effect: CardEffectData): any
@@ -163,6 +164,7 @@ end
 ---@field public click_count? boolean @ 是否在点击按钮瞬间就计数并播放特效和语音
 ---@field public enabled_at_nullification? fun(self: ViewAsSkill, player: Player, data: CardEffectData): boolean? @ 判断一张牌是否能被此技能转化无懈来响应
 ---@field public include_equip? boolean @ 选牌时是否展开装备区
+---@field public fix_targets? fun(self: ViewAsSkill, player: Player, selected_cards: integer[], card: Card, extra_data: any): Player[]? @ 设置固定目标
 
 ---@class DistanceSpec: StatusSkillSpec
 ---@field public correct_func? fun(self: DistanceSkill, from: Player, to: Player): integer?
