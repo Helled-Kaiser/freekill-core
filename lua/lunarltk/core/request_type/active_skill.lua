@@ -555,6 +555,9 @@ function ReqActiveSkill:update(elemType, id, action, data)
   elseif elemType == "Photo" then
     ---@cast id integer
     self:selectTarget(id, data)
+    if #self.selected_targets == 0 then
+      autoSelectOnlyFeasibleTarget(self, data)
+    end
     -- 双击目标使用卡牌
     --[[
     if action == "doubleClick" and data.doubleClickUse then
