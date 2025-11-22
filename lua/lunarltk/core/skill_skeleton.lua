@@ -625,6 +625,8 @@ function SkillSkeleton:createViewAsSkill(_skill, idx, key, attr, spec)
 
   if spec.fix_targets then
     skill.fixTargets = spec.fix_targets
+  elseif spec.target_filter then
+    skill.fixTargets = Util.DummyFunc
   end
 
   if spec.target_filter then skill.targetFilter = spec.target_filter end
