@@ -34,7 +34,7 @@ skill:addEffect("cardskill", {
   end,
 })
 
-skill:addAI({
+skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
   on_effect = function(self, logic, effect)
     logic:damage({
       from = effect.from,
@@ -42,9 +42,9 @@ skill:addAI({
       card = effect.card,
       damage = 1,
       damageType = fk.ThunderDamage,
-      skillName = skill.name,
+      skillName = skill.name
     })
   end,
-}, "__card_skill")
+})
 
 return skill

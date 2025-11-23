@@ -63,4 +63,11 @@ skill:addEffect("cardskill", {
   end,
 })
 
+skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  on_effect = function (self, logic, effect)
+    local weapons = effect.to:getEquipments(Card.SubtypeWeapon)
+    logic:obtainCard(effect.from, weapons, true, fk.ReasonGive, effect.to, skill.name)
+  end
+})
+
 return skill

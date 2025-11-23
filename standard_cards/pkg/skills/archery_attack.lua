@@ -40,6 +40,19 @@ skill:addEffect("cardskill", {
   end,
 })
 
+skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  on_effect = function(self, logic, effect)
+    logic:damage({
+      from = effect.from,
+      to = effect.to,
+      card = effect.card,
+      damage = 1,
+      damageType = fk.NormalDamage,
+      skillName = skill.name
+    })
+  end,
+})
+
 skill:addTest(function(room, me)
   local comp2 = room.players[2]
   local card = room:printCard("jink")
