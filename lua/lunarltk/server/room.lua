@@ -3752,5 +3752,12 @@ function Room:destroyTableCardByEvent(id)
   self:doBroadcastNotify("DestroyTableCardByEvent", id)
 end
 
+function Room:addNpc(nextPlayer)
+  local ret = ServerRoomBase.addNpc(self, nextPlayer)
+
+  self.alive_players = table.filter(self.players, function(p) return not p.dead end)
+
+  return ret
+end
 
 return Room

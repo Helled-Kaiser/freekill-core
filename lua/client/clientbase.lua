@@ -44,6 +44,8 @@ function ClientBase:initialize(_client)
   self:addCallback("PropertyUpdate", self.propertyUpdate)
   self:addCallback("GameLog", self.appendLog)
 
+  self:addCallback("AddNpc", self.addNpc)
+
   self:addCallback("GameOver", self.gameOver)
 end
 
@@ -565,6 +567,22 @@ function ClientBase:appendLog(msg)
   if msg.toast then
     self:notifyUI("ShowToast", text)
   end
+end
+
+function ClientBase:addNpc(data)
+  local id, name, avatar, ready, time = data[1], data[2], data[3], data[4], data[5]
+  local player = self.client:addPlayer(id, name, avatar)
+  player:addTotalGameTime(time or 0)
+  -- cpp连这个都没做？
+  if id > 0 then
+    player:setState(fk.Player_Online)
+  else
+    player:setState(fk.Player_Robot)
+  end
+  local p = self:createPlayer(player)
+  p.ready = ready
+  table.insert(self.players, p)
+  self:notifyUI("AddNpc", data)
 end
 
 function ClientBase:gameOver(jsonData)

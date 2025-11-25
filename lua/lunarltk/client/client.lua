@@ -64,6 +64,8 @@ function Client:initialize(_client)
   self:addCallback("ShowVirtualCard", self.showVirtualCard)
   self:addCallback("ChangeSkin", self.changeSkin)
 
+  self:addCallback("AddNpc", self.addNpc)
+
   self.disabled_packs = {}
   self.disabled_generals = {}
 end
@@ -954,6 +956,12 @@ function Client:sendDataToUI(data)
   ClientBase.sendDataToUI(self)
 
   self:notifyUI("UpdateRoundNum", data.round_count)
+end
+
+function Client:addNpc(data)
+  ClientBase.addNpc(self, data)
+  self.alive_players = table.filter(self.players, function(p) return not p.dead end)
+  print 'client new add npc'
 end
 
 return Client

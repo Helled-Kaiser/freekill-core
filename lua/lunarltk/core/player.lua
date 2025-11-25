@@ -84,6 +84,7 @@ function Player:initialize()
   })
   self.hp = 0
   self.maxHp = 0
+  self.shield = 0
   self.kingdom = "qun"
   self.general = ""
   self.deputyGeneral = ""
