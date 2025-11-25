@@ -252,7 +252,11 @@ end
 
 -- 存档相关
 local _ServerPlayer_saveState = function(self, jsonData)
-  callRpc("ServerPlayer_saveState", { self.connId, tostring(jsonData) })
+  local ret, err = callRpc("ServerPlayer_saveState", { self.connId, tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
 end
 
 local _ServerPlayer_getSaveState = function(self)
@@ -264,7 +268,11 @@ local _ServerPlayer_getSaveState = function(self)
 end
 
 local _ServerPlayer_saveGlobalState = function(self, key, jsonData)
-  callRpc("ServerPlayer_saveGlobalState", { self.connId, tostring(key), tostring(jsonData) })
+  local ret, err = callRpc("ServerPlayer_saveGlobalState", { self.connId, tostring(key), tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
 end
 
 local _ServerPlayer_getGlobalSaveState = function(self, key)
