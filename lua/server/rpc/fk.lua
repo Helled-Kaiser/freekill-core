@@ -252,7 +252,11 @@ end
 
 -- 存档相关
 local _ServerPlayer_saveState = function(self, jsonData)
-  callRpc("ServerPlayer_saveState", { self.connId, tostring(jsonData) })
+  local ret, err = callRpc("ServerPlayer_saveState", { self.connId, tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
 end
 
 local _ServerPlayer_getSaveState = function(self)
@@ -264,7 +268,11 @@ local _ServerPlayer_getSaveState = function(self)
 end
 
 local _ServerPlayer_saveGlobalState = function(self, key, jsonData)
-  callRpc("ServerPlayer_saveGlobalState", { self.connId, tostring(key), tostring(jsonData) })
+  local ret, err = callRpc("ServerPlayer_saveGlobalState", { self.connId, tostring(key), tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
 end
 
 local _ServerPlayer_getGlobalSaveState = function(self, key)
@@ -378,6 +386,15 @@ local _Room_setSessionData = function(self, jsonData)
   callRpc("Room_setSessionData", { self.id, tostring(jsonData) })
 end
 
+local _Room_addNpc = function(self)
+  local ret = callRpc("Room_addNpc", { self.id })
+  return fk.ServerPlayer(cbor.decode(ret))
+end
+
+local _Room_removeNpc = function(self, player)
+  callRpc("Room_removeNpc", { self.id, player.connId })
+end
+
 ---@type metatable
 local _Room_MT = {
   __index = {
@@ -402,6 +419,9 @@ local _Room_MT = {
     getSessionId = _Room_getSessionId,
     getSessionData = _Room_getSessionData,
     setSessionData = _Room_setSessionData,
+
+    addNpc = _Room_addNpc,
+    removeNpc = _Room_removeNpc,
 
     settings = function(t) return t._settings end,
   }

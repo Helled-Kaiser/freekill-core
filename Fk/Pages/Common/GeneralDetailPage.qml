@@ -1,9 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
+import QtQuick.Controls.FluentWinUI3
 
 import Fk
-import Fk.Widgets as W
 import Fk.Components.LunarLTK
 
 Item {
@@ -257,7 +256,7 @@ Item {
       interval: 4000
     }
 
-    W.ButtonContent {
+    Button {
       text: Lua.tr("Set as Avatar")
       visible: root.canSetAvatar
       enabled: detailGeneralCard.name !== "" && !opTimer.running
@@ -272,7 +271,7 @@ Item {
       }
     }
 
-    W.ButtonContent {
+    Button {
       text: root.isFavor ? Lua.tr("Remove from Favorite") : Lua.tr("Set as Favorite")
       onClicked: {
         const g = root.general;
