@@ -3,7 +3,14 @@
 local ActiveStrategy = require "lunarltk.server.ai.strategies.active"
 
 ---@class AI.CardSkillStrategy : AI.ActiveStrategy
+---@field keep_value number 弃牌时，保留在手中的价值
 local CardSkillStrategy = ActiveStrategy[1]:subclass("AI.CardSkillStrategy")
+
+function CardSkillStrategy:initialize()
+  ActiveStrategy[1].initialize(self)
+
+  self.keep_value = 0
+end
 
 ---@return [integer, ServerPlayer[]?, any]?, number?
 function CardSkillStrategy:think(ai)
@@ -87,6 +94,9 @@ end
 ---@param spec {
 ---  on_use?: fun(self: AI.CardSkillStrategy, logic: AIGameLogic, use: UseCardData),
 ---  on_effect?: fun(self: AI.CardSkillStrategy, logic: AIGameLogic, effect: CardEffectData),
+---  keep_value?: number,
+---  use_value?: number,
+---  use_priority?: number,
 ---}
 ---@return AI.CardSkillStrategy
 local function newCardSkillStrategy(spec)
@@ -94,6 +104,10 @@ local function newCardSkillStrategy(spec)
 
   if spec.on_use then ret.onUse = spec.on_use end
   if spec.on_effect then ret.onEffect = spec.on_effect end
+
+  if spec.keep_value then ret.keep_value = spec.keep_value end
+  if spec.use_value then ret.use_value = spec.use_value end
+  if spec.use_priority then ret.use_priority = spec.use_priority end
 
   return ret
 end

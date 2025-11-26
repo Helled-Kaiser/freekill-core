@@ -14,6 +14,7 @@ function AIGameLogic:initialize(ai, base_benefit)
   self.benefit = base_benefit or 0
   self.ai = ai
   self.player = ai.player
+  self.players = ai.room.players
   self.logic = self -- 用于处理room.logic 这样真的好么。。
 
   self.owner_map = ai.room.owner_map

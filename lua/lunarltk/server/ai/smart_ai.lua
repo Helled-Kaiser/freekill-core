@@ -125,9 +125,10 @@ function SmartAI:handleAskForUseActiveSkill()
     ai = self:findStrategyOfSkill(AI.ActiveStrategy, name)
   end
   if not ai then return "" end
-  verbose(1, "正在询问技能：%s", ai.skill.name)
+  local _dbg_skill = ai.skill and ai.skill.name or "unknown"
+  verbose(1, "正在询问技能：%s", _dbg_skill)
   local ret, real_val = ai:makeReply(self)
-  verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill.name, json.encode(ret), json.encode(real_val))
+  verbose(1, "%s: 思考结果是%s, 收益是%s", _dbg_skill, json.encode(ret), json.encode(real_val))
   return ret, real_val
 end
 
@@ -163,7 +164,7 @@ function SmartAI:handlePlayCard()
 
   local best_ret, best_val = "", cancel_val
   verbose(1, "目前的决策：直接取消(收益%g)", best_val)
-  for _, ai in ipairs(active_strategy_list) do
+  for _, ai in fk.sorted_pairs(active_strategy_list, function(a) return a.use_priority end) do
     self:selectSkill(ai.skill_name, true)
 
     -- 干脆直接走handleActive的流程
@@ -171,12 +172,19 @@ function SmartAI:handlePlayCard()
     local ret, real_val = ai:makeReply(self) -- "", -10000 -- ai:think(self)
     verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), json.encode(real_val))
     real_val = real_val or -100000
+
     -- if ret and ret ~= "" then return ret end
     if best_val < real_val then
       verbose(1, "将决策%s换成更好的%s (收益%g => %g)", json.encode(best_ret), json.encode(ret), best_val, real_val)
       best_ret, best_val = ret, real_val
     end
     self:unSelectAll()
+
+    -- FIXME: 为了实现按优先级出牌，干脆只要收益为正就出
+    if best_val > 0 and best_val > cancel_val then
+      verbose(1, "懒得推测了，得出决策%s", json.encode(best_ret))
+      return best_ret
+    end
   end
   verbose(1, "推测出最佳决策是%s", json.encode(best_ret))
   if best_ret and best_ret ~= "" then return best_ret end
@@ -329,6 +337,47 @@ end
 
 -- sorted_pairs 见 core/util.lua
 
+---@param tab ServerPlayer[]
+---@param key "hp"|"handcard"|"handcard_defense"|"value"|"chaofeng"|"defense"|"threat"
+---@param reverse boolean?
+function SmartAI:sortPlayers(tab, key, reverse)
+end
+
+---@param card integer|Card
+---@return number
+function SmartAI:getKeepValue(card)
+  if type(card) == "number" then
+    card = Fk:getCardById(card)
+  end
+  ---@cast card -integer
+
+  local strategy = self:findStrategyOfSkill(AI.CardSkillStrategy, card.skill.name)
+  if not strategy then return 0 end
+
+  return strategy.keep_value
+end
+
+---@param tab integer[]
+---@param key "keep_value"|"use_value"|"use_priority"
+---@param reverse boolean?
+function SmartAI:sortCards(tab, key, reverse)
+  local value_tab = {}
+  for _, id in ipairs(tab) do
+    if key == "keep_value" then
+      value_tab[id] = self:getKeepValue(id)
+    end
+  end
+
+  table.sort(tab, function(a, b)
+    local va, vb = value_tab[a], value_tab[b]
+    if reverse then
+      return a > b
+    else
+      return a < b
+    end
+  end)
+end
+
 -- 基于事件的收益推理；内置事件
 --=================================================
 
@@ -344,40 +393,6 @@ end
 
 -- 封装一些简单策略
 -- ========================================
-
----@class AIAskToDiscardParams: AskToUseActiveSkillParams
----@field skill_name string @ 技能名
----@field min_num integer @ 最小值
----@field max_num integer @ 最大值
-
---- 弃牌
----@param params AIAskToDiscardParams @ 各种变量
----@return integer[], integer @ 本次弃牌收益最大的一种情况，返回选择的卡牌和收益
-function SmartAI:askToDiscard(params)
-  local cards = self:getEnabledCards()
-  params.skill_name = params.skill_name or ""
-  params.max_num = math.min(params.max_num, #cards)
-  local benefit, ret = -100000, {}
-  if #cards < params.min_num then
-    ret = cards
-    benefit = self:getBenefitOfEvents(function(logic)
-      logic:throwCard(cards, params.skill_name, self.player, self.player)
-    end)
-  else
-    cards = self:getChoiceCardsByKeepValue(cards, math.min(params.max_num, #cards))
-    for i = params.min_num, params.max_num do
-      local ids = table.slice(cards, 1, i + 1)
-      local discard_val = self:getBenefitOfEvents(function(logic)
-        logic:throwCard(ids, params.skill_name, self.player, self.player)
-      end)
-      if discard_val > benefit then
-        benefit = discard_val
-        ret = ids
-      end
-    end
-  end
-  return ret, benefit
-end
 
 ---@class AIAskToChooseCardsParams
 ---@field cards integer[] @ 被选择的牌

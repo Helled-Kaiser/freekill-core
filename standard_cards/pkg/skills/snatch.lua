@@ -20,6 +20,10 @@ skill:addEffect("cardskill", {
 })
 
 skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  keep_value = 3.46,
+  use_value = 9,
+  use_priority = 4.3,
+
   on_effect = function(self, logic, effect)
     local ret, benefit = effect.from.ai:askToChooseCards({
       cards = effect.to:getCardIds("hej"),

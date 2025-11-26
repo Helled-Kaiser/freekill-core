@@ -14,6 +14,10 @@ skill:addEffect("cardskill", {
 })
 
 skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  keep_value = 2.02,
+  use_value = 2.04,
+  use_priority = 4.1,
+
   on_use = function(self, logic, use)
     if not use.tos or #use.tos == 0 then
       use.tos = { use.from }

@@ -1,7 +1,16 @@
 local AIStrategy = require "lunarltk.server.ai.strategy"
 
 ---@class AI.ActiveStrategy : AIStrategy
+---@field use_value number 给牌时，考虑一下使用的价值
+---@field use_priority number 出牌阶段，考虑一下使用的优先度
 local ActiveStrategy = AIStrategy:subclass("AI.ActiveStrategy")
+
+function ActiveStrategy:initialize()
+  AIStrategy.initialize(self)
+
+  self.use_value = 0
+  self.use_priority = 0
+end
 
 -- 这是默认的think 要求用户实现几个接口供我跑收益程序
 -- 当然用户可以自己实现think 直接返回think结果
@@ -138,6 +147,8 @@ end
 
 ---@param spec {
 ---  think?: (fun(self: AI.ActiveStrategy, ai: SmartAI): [ integer[], ServerPlayer[]?, any ]?, number?),
+---  use_value?: number,
+---  use_priority?: number,
 ---}
 ---@return AI.ActiveStrategy
 local function newActiveStrategy(spec)
@@ -145,6 +156,9 @@ local function newActiveStrategy(spec)
   if spec.think then
     ret.think = spec.think
   end
+
+  if spec.use_value then ret.use_value = spec.use_value end
+  if spec.use_priority then ret.use_priority = spec.use_priority end
 
   return ret
 end

@@ -64,6 +64,10 @@ analepticSkill:addEffect(fk.TurnEnd, {
 })
 
 analepticSkill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  keep_value = 4.1,
+  use_value = 5.98,
+  use_priority = 3.0,
+
   on_effect = function (self, logic, effect)
     if effect.extra_data and effect.extra_data.analepticRecover then
       logic:recover({

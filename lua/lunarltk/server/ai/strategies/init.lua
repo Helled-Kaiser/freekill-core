@@ -3,6 +3,7 @@ local card_skill = require 'lunarltk.server.ai.strategies.card_skill'
 local invoke = require 'lunarltk.server.ai.strategies.invoke'
 local choice = require 'lunarltk.server.ai.strategies.choice'
 local card_chosen = require 'lunarltk.server.ai.strategies.card_chosen'
+local discard = require 'lunarltk.server.ai.strategies.discard'
 
 return {
   ActiveStrategy = active[1],
@@ -13,10 +14,13 @@ return {
 
   InvokeStrategy = invoke[1],
   newInvokeStrategy = invoke[2],
-  
+
   ChoiceStrategy = choice[1],
   newChoiceStrategy = choice[2],
-  
+
   CardChosenStrategy = card_chosen[1],
   newCardChosenStrategy = card_chosen[2],
+
+  DiscardStrategy = discard[1],
+  newDiscardStrategy = discard[2],
 }

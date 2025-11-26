@@ -24,6 +24,10 @@ skill:addEffect("cardskill", {
 })
 
 skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  keep_value = 7,
+  use_value = 6,
+  use_priority = 0.9,
+
   on_effect = function(self, logic, effect)
     logic:recover{
       who = effect.to,

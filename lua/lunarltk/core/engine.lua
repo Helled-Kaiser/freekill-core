@@ -90,7 +90,6 @@ function Engine:initialize()
     AIStrategy = require 'lunarltk.server.ai.strategy',
 
     AI = require 'lunarltk.server.ai.strategies',
-    -- AuxAI = require 'lunarltk.server.ai.strategies',
   }
 end
 
