@@ -1,15 +1,18 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls.FluentWinUI3
+import QtQuick.Controls
 
 import Fk
 import Fk.Widgets as W
 import Fk.Components.LunarLTK
 
+// 神秘bug 在import Fk之前引进这个会把Config单例爆破
+import QtQuick.Controls.FluentWinUI3 as Win
+
 Item {
   id: root
 
-  property string general: "caocao"
+  property string general: ""
   property bool canSetAvatar
   property bool isFavor: {
     const g = root.general;
@@ -189,7 +192,7 @@ Item {
 
   Component {
     id: skillAudioBtn
-    Button {
+    Win.Button {
       Layout.fillWidth: true
       contentItem: Column {
         Text {
@@ -336,7 +339,7 @@ Item {
       interval: 4000
     }
 
-    Button {
+    Win.Button {
       Layout.preferredWidth: 130
       text: Lua.tr("Set as Avatar")
       visible: root.canSetAvatar
@@ -352,7 +355,7 @@ Item {
       }
     }
 
-    Button {
+    Win.Button {
       Layout.preferredWidth: 130
       text: root.isFavor ? Lua.tr("Remove from Favorite") : Lua.tr("Set as Favorite")
       onClicked: {
@@ -432,7 +435,7 @@ Item {
             }
           }
 
-          Button {
+          Win.Button {
             id: audioWin
             Layout.fillWidth: true
             contentItem: Column {
@@ -504,7 +507,7 @@ Item {
             }
           }
 
-          Button {
+          Win.Button {
             id: audioDeath
             Layout.fillWidth: true
             contentItem: Column {
@@ -606,19 +609,4 @@ Item {
       ]
     }
   }
-
-  /*
-  Flickable {
-    id: detailFlickable
-    flickableDirection: Flickable.VerticalFlick
-    contentHeight: detailLayout.height
-    clip: true
-
-    ColumnLayout {
-      id: detailLayout
-      width: parent.width
-
-    }
-  }
-  */
 }
