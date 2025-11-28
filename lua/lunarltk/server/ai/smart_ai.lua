@@ -352,9 +352,16 @@ function SmartAI:getKeepValue(card)
   ---@cast card -integer
 
   local strategy = self:findStrategyOfSkill(AI.CardSkillStrategy, card.skill.name)
-  if not strategy then return 0 end
+  local ret = 0
+  if strategy then
+    -- TODO: 可能可以是function
+    ret = strategy.keep_value
+  end
 
-  return strategy.keep_value
+  -- TODO: 可能可以类似状态技一样给Room挂点状态技性质策略
+  -- TODO: 这样那些策略会影响某些卡的keep value
+
+  return ret
 end
 
 ---@param tab integer[]
