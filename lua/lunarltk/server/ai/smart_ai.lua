@@ -338,7 +338,7 @@ end
 -- sorted_pairs 见 core/util.lua
 
 ---@param tab ServerPlayer[]
----@param key "hp"|"handcard"|"handcard_defense"|"value"|"chaofeng"|"defense"|"threat"
+---@param key "hp"|"handcard"|"handcard_defense"|"value"|"taunt"|"defense"|"threat"
 ---@param reverse boolean?
 function SmartAI:sortPlayers(tab, key, reverse)
 end
