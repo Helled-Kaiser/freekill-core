@@ -24,4 +24,43 @@ choosePlayersSkill:addEffect('active', {
   max_target_num = function(self) return self.num end,
 })
 
+choosePlayersSkill:addAI(Fk.Ltk.AI.newActiveStrategy {
+  think = function(self, ai)
+    local data = ai.data[4]
+    local orig = Fk.skills[data.skillName] or choosePlayersSkill
+    local strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseStrategy, orig.name)
+    if not strategy then
+      strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseStrategy, choosePlayersSkill.name)
+      ---@cast strategy -nil
+    end
+
+    local cards, card_benefit = strategy:chooseCards(ai)
+    local players, player_benefit = strategy:choosePlayers(ai)
+    if cards then
+      return { cards, players }, ((card_benefit == 0 and 1 or card_benefit) * player_benefit) or 0
+    end
+  end,
+})
+
+choosePlayersSkill:addAI(Fk.Ltk.AI.newChooseStrategy {
+  choose_cards = function (self, ai)
+    local data = ai.data[4] -- extra_data
+    local available_cards = ai:getEnabledCards()
+
+    if ai.data[3] --[[ cancelable ]] or data.pattern == "" then return {}, 0 end
+
+    table.shuffle(available_cards) -- 随机选择以视高深莫测
+    return table.slice(available_cards, 1, 1), 0
+  end,
+  choose_players = function(self, ai)
+    local data = ai.data[4] -- extra_data
+    local available_players = ai:getEnabledTargets()
+
+    if ai.data[3] --[[ cancelable ]] then return {}, 0 end
+
+    table.shuffle(available_players) -- 随机选择以视高深莫测
+    return table.map(table.slice(available_players, data.min_num, data.num), Util.IdMapper), 0
+  end
+})
+
 return choosePlayersSkill
