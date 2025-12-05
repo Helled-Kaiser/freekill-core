@@ -212,7 +212,7 @@ end
 ---@field public recheck_invalidity? boolean @ 是否涉及其他技能的失效性
 
 ---@class VisibilitySpec: StatusSkillSpec
----@field public card_visible? fun(self: VisibilitySkill, player: Player, card: Card): any @ 某牌的可见性
+---@field public card_visible? fun(self: VisibilitySkill, player: Player, card: Card, toChoose: boolean): any @ 某牌的可见性
 ---@field public move_visible? fun(self: VisibilitySkill, player: Player, info: MoveInfo, move: MoveCardsDataSpec): any @ 某牌在某次移动中的可见性
 ---@field public role_visible? fun(self: VisibilitySkill, player: Player, target: Player): any @ 身份的可见性
 

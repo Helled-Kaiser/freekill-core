@@ -1586,8 +1586,9 @@ end
 --- Player是否可看到某card
 --- @param cardId integer
 ---@param move? MoveCardsData @ 移动数据，注意涉及Player全是id
+---@param toChoose? boolean @ 是否将用于选牌判断
 ---@return boolean
-function Player:cardVisible(cardId, move)
+function Player:cardVisible(cardId, move, toChoose)
   local room = Fk:currentRoom()
   if room.replaying and room.replaying_show then return true end
 
@@ -1649,7 +1650,7 @@ function Player:cardVisible(cardId, move)
 
   if not room.observing then
     for _, skill in ipairs(status_skills) do
-      local f = skill:cardVisible(self, card)
+      local f = skill:cardVisible(self, card, toChoose)
       if f ~= nil then
         return f
       end
