@@ -492,6 +492,7 @@ end
 ---@param excludeSkills? string[] @ 忽略的技能名列表
 ---@return integer
 function Player:getAttackRange(excludeIds, excludeSkills)
+  excludeSkills = excludeSkills or {}
   local baseValue = 1
 
   local weapons = table.filter(self:getEquipments(Card.SubtypeWeapon), function (id)
@@ -500,15 +501,23 @@ function Player:getAttackRange(excludeIds, excludeSkills)
       return weapon:AvailableAttackRange(self)
     end
   end)
+
+  local status_skills = Fk:currentRoom().status_skills[AttackRangeSkill] or Util.DummyTable ---@type AttackRangeSkill[]
   if #weapons > 0 then
     baseValue = 0
     for _, id in ipairs(weapons) do
       local weapon = self:getVirtualEquip(id) or Fk:getCardById(id) ---@class Weapon
       baseValue = math.max(baseValue, weapon:getAttackRange(self) or 1)
     end
+
+    for _, skill in ipairs(status_skills) do
+      if not table.contains(excludeSkills, skill.name) then
+        local atkRange = skill:getVirtualWeaponAttackRange(self)
+        baseValue = math.max(baseValue, atkRange or 0)
+      end
+    end
   end
 
-  excludeSkills = excludeSkills or {}
   if excludeIds then
     for _, id in ipairs(excludeIds) do
       local equip = self:getVirtualEquip(id) --[[@as EquipCard]]
@@ -523,7 +532,6 @@ function Player:getAttackRange(excludeIds, excludeSkills)
     end
   end
 
-  local status_skills = Fk:currentRoom().status_skills[AttackRangeSkill] or Util.DummyTable ---@type AttackRangeSkill[]
   local max_fixed, correct = nil, 0
   for _, skill in ipairs(status_skills) do
     if not table.contains(excludeSkills, skill.name) then
