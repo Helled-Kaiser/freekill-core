@@ -509,12 +509,12 @@ function Player:getAttackRange(excludeIds, excludeSkills)
       local weapon = self:getVirtualEquip(id) or Fk:getCardById(id) ---@class Weapon
       baseValue = math.max(baseValue, weapon:getAttackRange(self) or 1)
     end
+  end
 
-    for _, skill in ipairs(status_skills) do
-      if not table.contains(excludeSkills, skill.name) then
-        local atkRange = skill:getVirtualWeaponAttackRange(self)
-        baseValue = math.max(baseValue, atkRange or 0)
-      end
+  for _, skill in ipairs(status_skills) do
+    if not table.contains(excludeSkills, skill.name) then
+      local atkRange = skill:getVirtualWeaponAttackRange(self)
+      baseValue = math.max(baseValue, atkRange or 0)
     end
   end
 
