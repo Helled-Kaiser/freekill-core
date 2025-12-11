@@ -572,4 +572,47 @@ function ServerRoomBase:addNpc(nextPlayer)
   return bot
 end
 
+--- 全局存档
+---@param key string 存档名
+---@param data table
+function ServerRoomBase:saveGlobalState(key, data)
+  if not self.room then return nil end
+  if type(self.room.saveGlobalState) ~= "function" then
+    fk.qWarning("self._splayer.saveGlobalState doesn't exist, Please ensure that the server version is freekill-asio 0.0.6+")
+    return nil
+  end
+  local ok, jsonData = pcall(json.encode, data)
+  if ok then
+    local ret = self.room:saveGlobalState(key, jsonData)
+    if type(ret) == "boolean" then
+      coroutine.yield("__handleRequest")
+    end
+  else
+    fk.qWarning("Failed to encode global save data: " .. jsonData)
+  end
+end
+
+--- 获取全局存档
+---@param key string 存档名
+---@return table @ 不存在返回空表
+function ServerRoomBase:getGlobalSaveState(key)
+  if not self.room then return {} end
+  if type(self.room.getGlobalSaveState) ~= "function" then
+    fk.qWarning("self._splayer.getGlobalSaveState doesn't exist, Please ensure that the server version is freekill-asio 0.0.6+")
+    return {}
+  end
+  local data = self.room:getGlobalSaveState(key)
+  if type(data) == "boolean" then
+    data = coroutine.yield("__handleRequest")
+  end
+  local ok, result = pcall(json.decode, data or "{}")
+  if ok then
+    return result
+  else
+    fk.qWarning("Failed to decode global save data: " .. result)
+    return {}
+  end
+end
+
+
 return ServerRoomBase

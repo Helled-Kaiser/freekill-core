@@ -395,6 +395,22 @@ local _Room_removeNpc = function(self, player)
   callRpc("Room_removeNpc", { self.id, player.connId })
 end
 
+local _Room_saveGlobalState = function(self, key, jsonData)
+  local ret, err = callRpc("Room_saveGlobalState", { self.id, tostring(key), tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
+local _Room_getGlobalSaveState = function(self, key)
+  local ret, err = callRpc("Room_getGlobalSaveState", { self.id, tostring(key) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
 ---@type metatable
 local _Room_MT = {
   __index = {
@@ -422,6 +438,9 @@ local _Room_MT = {
 
     addNpc = _Room_addNpc,
     removeNpc = _Room_removeNpc,
+
+    saveGlobalState = _Room_saveGlobalState,
+    getGlobalSaveState = _Room_getGlobalSaveState,
 
     settings = function(t) return t._settings end,
   }
