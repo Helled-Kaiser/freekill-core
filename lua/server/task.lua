@@ -3,12 +3,12 @@
 ---@field co any
 ---@field type string
 ---@field data string
----@field player ServerPlayerBase?
+---@field player TaskPlayer?
 ---@field cServer any
 ---@field cTask any
 local Task = class("Task")
 
-local ServerPlayerBase = require "server.serverplayer_base"
+local TaskPlayer = require "server.taskplayer"
 
 function Task:initialize(cServer, cTask)
   self.cServer = cServer
@@ -16,10 +16,15 @@ function Task:initialize(cServer, cTask)
 
   self.id = cTask:getId()
   self.type = cTask:getTaskType()
-  self.data = cTask:getData()
+  local ok, data = pcall(cbor.decode, cTask:getData())
+  if ok then
+    self.data = data
+  else
+    fk.qWarning("cbor decode error on task initialization: " .. cTask:getData())
+  end
   local p = cTask:getPlayer()
   if p then
-    self.player = ServerPlayerBase:new(p)
+    self.player = TaskPlayer:new(p, self)
   end
 end
 
@@ -40,6 +45,10 @@ function Task:resume(reason)
   end
 
   local main_co = self.co
+
+  if reason == "abort" then
+    goto FIN
+  end
 
   do
     local ret, err_msg, rest_time = coroutine.resume(main_co, reason)
@@ -76,14 +85,9 @@ end
 ---@param key string 存档名
 ---@param data table
 function Task:saveGlobalState(key, data)
-  local lobby = self.cServer:lobby()
-  if type(lobby.saveGlobalState) ~= "function" then
-    fk.qWarning("self._splayer.saveGlobalState doesn't exist, Please ensure that the server version is freekill-asio 0.0.6+")
-    return nil
-  end
   local ok, jsonData = pcall(json.encode, data)
   if ok then
-    local ret = lobby:saveGlobalState(key, jsonData)
+    local ret = self.cTask:saveGlobalState(key, jsonData)
     if type(ret) == "boolean" then
       coroutine.yield("__handleRequest")
     end
@@ -96,12 +100,7 @@ end
 ---@param key string 存档名
 ---@return table @ 不存在返回空表
 function Task:getGlobalSaveState(key)
-  local lobby = self.cServer:lobby()
-  if type(lobby.getGlobalSaveState) ~= "function" then
-    fk.qWarning("self._splayer.getGlobalSaveState doesn't exist, Please ensure that the server version is freekill-asio 0.0.6+")
-    return {}
-  end
-  local data = lobby:getGlobalSaveState(key)
+  local data = self.cTask:getGlobalSaveState(key)
   if type(data) == "boolean" then
     data = coroutine.yield("__handleRequest")
   end

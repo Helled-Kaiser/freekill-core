@@ -120,9 +120,7 @@ local function resumeTask(taskId, reason)
 
   if over then
     runningTasks[task.id] = nil
-    -- room.room:decreaseRefCount()
-    -- room = nil
-    -- collectgarbage("collect")
+    task.cTask:decreaseRefCount()
   end
   return over
 end
@@ -148,8 +146,6 @@ function ResumeRoom(roomId, reason)
     end
     runningRooms[room.id] = nil
     room.room:decreaseRefCount()
-    -- room = nil
-    -- collectgarbage("collect")
   end
   return over
 end
