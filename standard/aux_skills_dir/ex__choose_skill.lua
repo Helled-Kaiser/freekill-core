@@ -57,9 +57,9 @@ exChooseSkill:addAI(Fk.Ltk.AI.newActiveStrategy {
   think = function(self, ai)
     local data = ai.data[4]
     local orig = Fk.skills[data.skillName] or exChooseSkill
-    local strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseStrategy, orig.name)
+    local strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseCardsAndPlayersStrategy, orig.name)
     if not strategy then
-      strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseStrategy, exChooseSkill.name)
+      strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.ChooseCardsAndPlayersStrategy, exChooseSkill.name)
       ---@cast strategy -nil
     end
 
@@ -71,7 +71,7 @@ exChooseSkill:addAI(Fk.Ltk.AI.newActiveStrategy {
   end,
 })
 
-exChooseSkill:addAI(Fk.Ltk.AI.newChooseStrategy {
+exChooseSkill:addAI(Fk.Ltk.AI.newChooseCardsAndPlayersStrategy {
   choose_cards = function (self, ai)
     local data = ai.data[4] -- extra_data
     local available_players = ai:getEnabledCards()

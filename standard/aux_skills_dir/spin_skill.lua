@@ -14,9 +14,9 @@ spin_skill:addAI(Fk.Ltk.AI.newActiveStrategy {
   think = function(self, ai)
     local data = ai.data[4]
     local orig = Fk.skills[data.skillName] or spin_skill
-    local strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.SpinStrategy, orig.name)
+    local strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.NumberStrategy, orig.name)
     if not strategy then
-      strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.SpinStrategy, spin_skill.name)
+      strategy = ai:findStrategyOfSkill(Fk.Ltk.AI.NumberStrategy, spin_skill.name)
       ---@cast strategy -nil
     end
 
@@ -27,7 +27,7 @@ spin_skill:addAI(Fk.Ltk.AI.newActiveStrategy {
   end,
 })
 
-spin_skill:addAI(Fk.Ltk.AI.newSpinStrategy {
+spin_skill:addAI(Fk.Ltk.AI.newNumberStrategy {
   choose_interaction = function (self, ai)
     local data = ai.data[4] -- extra_data
 

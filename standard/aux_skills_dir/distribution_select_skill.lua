@@ -37,7 +37,7 @@ distributionSelectSkill:addAI(Fk.Ltk.AI.newActiveStrategy {
   end,
 })
 
-distributionSelectSkill:addAI(Fk.Ltk.AI.newChooseStrategy {
+distributionSelectSkill:addAI(Fk.Ltk.AI.newYijiStrategy {
   choose_cards = function (self, ai)
     local data = ai.data[4] -- extra_data
     local available_cards = ai:getEnabledCards()

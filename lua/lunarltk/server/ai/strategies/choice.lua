@@ -8,6 +8,7 @@ function ChoiceStrategy:think(ai)
 end
 
 ---@param val string?
+---@return string?
 function ChoiceStrategy:convertThinkResult(val)
   if not val then return end
   return val

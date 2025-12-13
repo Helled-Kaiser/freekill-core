@@ -9,7 +9,7 @@ function DiscardStrategy:chooseCards(ai)
 end
 
 ---@param spec {
----  choose_cards?: (fun(self: AI.ActiveStrategy, ai: SmartAI): integer[]?, number?),
+---  choose_cards?: (fun(self: AI.DiscardStrategy, ai: SmartAI): integer[]?, number?),
 ---}
 ---@return AI.DiscardStrategy
 local function newDiscardStrategy(spec)
