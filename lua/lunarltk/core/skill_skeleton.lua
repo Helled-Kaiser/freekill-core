@@ -373,7 +373,7 @@ end
 function SkillSkeleton:createAttackRangeSkill(_skill, idx, key, attr, spec)
   assert(type(spec.correct_func) == "function" or type(spec.fixed_func) == "function" or
     type(spec.within_func) == "function" or type(spec.without_func) == "function" or
-    type(spec.final_func) == "function")
+    type(spec.final_func) == "function" or type(spec.virtual_weapon_func) == "function")
   local new_name = string.format("#%s_%d_atkrange", _skill.name, idx)
   Fk:loadTranslationTable({ [new_name] = Fk:translate(_skill.name) }, Config.language)
 
@@ -393,6 +393,9 @@ function SkillSkeleton:createAttackRangeSkill(_skill, idx, key, attr, spec)
   end
   if spec.without_func then
     skill.withoutAttackRange = spec.without_func
+  end
+  if spec.virtual_weapon_func then
+    skill.getVirtualWeaponAttackRange = spec.virtual_weapon_func
   end
 
   return skill

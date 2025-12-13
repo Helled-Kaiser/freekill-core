@@ -209,6 +209,70 @@ end
 
 -- swig/server.i
 
+local _Task_delay = function(self, ms)
+  assert(math.type(ms) == "integer")
+
+  callRpc("Task_delay", { self.id, ms })
+end
+
+local _Task_decreaseRefCount = function(self)
+  callRpc("Task_decreaseRefCount", { self.id })
+end
+
+local _Task_saveGlobalState = function(self, key, jsonData)
+  local ret, err = callRpc("Task_saveGlobalState", { self.id, tostring(key), tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
+local _Task_getGlobalSaveState = function(self, key)
+  local ret, err = callRpc("Task_getGlobalSaveState", { self.id, tostring(key) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
+local _Task_getPlayer = function(self)
+  local playerData = callRpc("Task_getPlayer", { self.id })
+  return fk.ServerPlayer(cbor.decode(playerData))
+end
+
+local _Task_MT = {
+  __index = {
+    getId = function(t) return t.id end,
+    getTaskType = function(t) return t.taskType end,
+    getData = function(t) return t.data end,
+
+    delay = _Task_delay,
+    decreaseRefCount = _Task_decreaseRefCount,
+    saveGlobalState = _Task_saveGlobalState,
+    getGlobalSaveState = _Task_getGlobalSaveState,
+    getPlayer = _Task_getPlayer,
+  }
+}
+
+fk.Task = function(t)
+  return setmetatable({
+    id = t.id,
+    taskType = t.taskType,
+    data = t.data,
+  }, _Task_MT)
+end
+
+local _Server_getTask = function(_, id)
+  local taskData = callRpc("Server_getTask", { id })
+  return fk.Task(cbor.decode(taskData))
+end
+
+fk.Server = function()
+  return {
+    getTask = _Server_getTask,
+  }
+end
+
 ---@param command string
 ---@param jsondata string
 ---@param timeout integer
@@ -395,6 +459,22 @@ local _Room_removeNpc = function(self, player)
   callRpc("Room_removeNpc", { self.id, player.connId })
 end
 
+local _Room_saveGlobalState = function(self, key, jsonData)
+  local ret, err = callRpc("Room_saveGlobalState", { self.id, tostring(key), tostring(jsonData) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
+local _Room_getGlobalSaveState = function(self, key)
+  local ret, err = callRpc("Room_getGlobalSaveState", { self.id, tostring(key) })
+  if err ~= nil then
+    return nil
+  end
+  return ret
+end
+
 ---@type metatable
 local _Room_MT = {
   __index = {
@@ -422,6 +502,9 @@ local _Room_MT = {
 
     addNpc = _Room_addNpc,
     removeNpc = _Room_removeNpc,
+
+    saveGlobalState = _Room_saveGlobalState,
+    getGlobalSaveState = _Room_getGlobalSaveState,
 
     settings = function(t) return t._settings end,
   }

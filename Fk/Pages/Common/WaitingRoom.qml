@@ -609,6 +609,8 @@ W.PageBase {
     } else {
       isFull = true;
     }
+
+    App.showToast(Lua.tr("$RoomConfigChanged"));
   }
 
   Component.onCompleted: {

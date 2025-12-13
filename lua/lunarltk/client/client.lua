@@ -287,7 +287,7 @@ function Client:askForCardChosen(data)
     end
     local visible_data = {}
     for _, cid in ipairs(table.connect(hand, judge)) do
-      if not Self:cardVisible(cid) then
+      if not Self:cardVisible(cid, nil, true) then
         visible_data[tostring(cid)] = false
       end
     end

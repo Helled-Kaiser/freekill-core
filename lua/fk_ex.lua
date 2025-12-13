@@ -183,6 +183,7 @@ end
 ---@field public final_func? fun(self: AttackRangeSkill, player: Player): number?  @ 判定角色的锁定攻击范围终值
 ---@field public within_func? fun(self: AttackRangeSkill, from: Player, to: Player): any @ 判定to角色是否锁定在角色from攻击范围内
 ---@field public without_func? fun(self: AttackRangeSkill, from: Player, to: Player): any @ 判定to角色是否锁定在角色from攻击范围外
+---@field public virtual_weapon_func? fun(self: AttackRangeSkill, player: Player): any @ 虚拟武器攻击范围
 
 ---@class MaxCardsSpec: StatusSkillSpec
 ---@field public correct_func? fun(self: MaxCardsSkill, player: Player): number?
@@ -212,7 +213,7 @@ end
 ---@field public recheck_invalidity? boolean @ 是否涉及其他技能的失效性
 
 ---@class VisibilitySpec: StatusSkillSpec
----@field public card_visible? fun(self: VisibilitySkill, player: Player, card: Card): any @ 某牌的可见性
+---@field public card_visible? fun(self: VisibilitySkill, player: Player, card: Card, toChoose: boolean): any @ 某牌的可见性
 ---@field public move_visible? fun(self: VisibilitySkill, player: Player, info: MoveInfo, move: MoveCardsDataSpec): any @ 某牌在某次移动中的可见性
 ---@field public role_visible? fun(self: VisibilitySkill, player: Player, target: Player): any @ 身份的可见性
 
