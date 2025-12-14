@@ -504,6 +504,13 @@ Item {
               }
               return ret;
             }
+
+            onClicked: {
+              if (!Config.observing) return;
+              if (observing) return;
+              if (screenName == Self.screenName) return;
+              Lua.evaluate(`ClientInstance:changeSelf(${pid})`)
+            }
           }
         }
       }
@@ -522,7 +529,7 @@ Item {
       const ps = Lua.call("GetPlayersAndObservers");
       ps.forEach(p => {
         playerListModel.append({
-          id: p.id,
+          pid: p.id,
           screenName: p.name,
           general: p.general ?? "",
           deputyGeneral: p.deputy ?? "",

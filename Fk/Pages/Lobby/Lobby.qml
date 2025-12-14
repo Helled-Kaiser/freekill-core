@@ -386,6 +386,8 @@ W.PageBase {
     onClicked: {
       App.showToast("Goodbye.");
       App.quitPage();
+      Config.observing = false;
+      Config.replaying = false;
       Config.saveConf();
       Cpp.quitLobby();
     }
