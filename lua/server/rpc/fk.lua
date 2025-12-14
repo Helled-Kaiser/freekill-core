@@ -266,7 +266,7 @@ local _Task_MT = {
     decreaseRefCount = _Task_decreaseRefCount,
     saveGlobalState = _Task_saveGlobalState,
     getGlobalSaveState = _Task_getGlobalSaveState,
-    savePlayerGlobalSaveState = _Task_savePlayerGlobalState,
+    savePlayerGlobalState = _Task_savePlayerGlobalState,
     getPlayerGlobalSaveState = _Task_getPlayerGlobalSaveState,
     getPlayer = _Task_getPlayer,
   }
