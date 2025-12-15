@@ -1387,7 +1387,7 @@ function Room:askToChooseCards(player, params)
     poxi_type = "AskForCardsChosen",
     data = cards_data,
     extra_data = data,
-    cancelable = params.cancelable
+    cancelable = params.cancelable == nil and false or params.cancelable
   }
 
   local ret = self:askToPoxi(player, poxiParams)
