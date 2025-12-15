@@ -386,8 +386,6 @@ W.PageBase {
     onClicked: {
       App.showToast("Goodbye.");
       App.quitPage();
-      Config.observing = false;
-      Config.replaying = false;
       Config.saveConf();
       Cpp.quitLobby();
     }
@@ -605,6 +603,9 @@ W.PageBase {
     rearrangePreferred();
 
     Db.tryInitModeSettings();
+
+    Config.observing = false;
+    Config.replaying = false;
     App.showToast(Lua.tr("$WelcomeToLobby"));
   }
 }

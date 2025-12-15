@@ -1685,7 +1685,7 @@ function Player:roleVisible(target)
     end
   end
 
-  if (room.replaying or not (room.observing and not room:getSettings("enableObserverViewCard"))) and target == self then return true end
+  if (room.replaying or not room.observing) and target == self then return true end
   if room.replaying and room.replaying_show then return true end
 
   return target.role_shown
