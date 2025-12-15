@@ -109,6 +109,8 @@ Fk:loadTranslationTable {
   ["help: Enable free assign"] = "启用后在选将界面长按或右键武将牌。",
   ["Enable deputy general"] = "启用副将机制",
   ["help: Enable deputy general"] = "请注意部分模式本身不支持副将机制。",
+  ["Observer can view card"] = "旁观者可见手牌",
+  ["help: Observer can view card"] = "开启后，旁观者将可以看到其视角下的牌，包括切换视角后",
   ["General Settings"] = "通常设置",
   ["Package Settings"] = "拓展包设置",
   ["General Packages"] = "武将拓展包",

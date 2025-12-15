@@ -1586,7 +1586,7 @@ end
 ---@param other Player|integer
 function Player:isBuddy(other)
   local room = Fk:currentRoom()
-  if room.observing and not room.replaying then return false end
+  if room.observing and not room.replaying and not room:getSettings("enableObserverViewCard") then return false end
   local id = type(other) == "number" and other or other.id
   return self.id == id or table.contains(self.buddy_list, id)
 end
@@ -1656,7 +1656,7 @@ function Player:cardVisible(cardId, move, toChoose)
   local owner = room:getCardOwner(cardId)
   local card = Fk:getCardById(cardId)
 
-  if not room.observing then
+  if not (room.observing and not room:getSettings("enableObserverViewCard")) then
     for _, skill in ipairs(status_skills) do
       local f = skill:cardVisible(self, card, toChoose)
       if f ~= nil then
