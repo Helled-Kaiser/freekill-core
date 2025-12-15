@@ -1321,7 +1321,7 @@ end
 ---@class AskToChooseCardsParams: AskToChooseCardParams
 ---@field min integer @ 最小选牌数
 ---@field max integer @ 最大选牌数
----@field cancelable? boolean @ 是否可取消
+---@field cancelable? boolean @ 是否可取消，**默认不可**
 ---@field pattern? string @ 只针对可见牌的选牌规则
 
 --- 完全类似askForCardChosen，但是可以选择多张牌。
