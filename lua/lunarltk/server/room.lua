@@ -1321,7 +1321,7 @@ end
 ---@class AskToChooseCardsParams: AskToChooseCardParams
 ---@field min integer @ 最小选牌数
 ---@field max integer @ 最大选牌数
----@field cancelable? boolean @ 是否可取消
+---@field cancelable? boolean @ 是否可取消，**默认不可**
 ---@field pattern? string @ 只针对可见牌的选牌规则
 
 --- 完全类似askForCardChosen，但是可以选择多张牌。
@@ -1331,6 +1331,7 @@ end
 ---@return integer[] @ 选择的id
 function Room:askToChooseCards(player, params)
   local target, flag, reason, prompt = params.target, params.flag, params.skill_name, params.prompt
+  params.cancelable = not not params.cancelable
   local min, max = params.min, params.max
   if min == 1 and max == 1 and not params.cancelable and not params.pattern then
     return { self:askToChooseCard(player, params) }
