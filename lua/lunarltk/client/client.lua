@@ -607,9 +607,11 @@ function Client:showCard(data)
   }
   src = src or 0
   local from = self:getPlayerById(src)
-  for _, p in ipairs(self.players) do
-    for _, id in ipairs(cards) do
-      p.card_tracker:setCardKnown(id, from, Card.PlayerHand)
+  if from then
+    for _, p in ipairs(self.players) do
+      for _, id in ipairs(cards) do
+        p.card_tracker:setCardKnown(id, from, Card.PlayerHand)
+      end
     end
   end
 
