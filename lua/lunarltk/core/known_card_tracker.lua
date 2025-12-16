@@ -19,6 +19,7 @@ end
 ---@field draw_pile KnownCards 摸牌堆的记牌
 ---@field discard_pile KnownCards 弃牌堆的记牌
 ---@field processing_area KnownCards 处理区的记牌
+---@field void KnownCards 处理区的记牌
 ---@field draw_pile_order integer[] 摸牌堆特有的顺序记牌
 local KnownCardTracker = class("KnownCardTracker")
 
@@ -29,6 +30,7 @@ function KnownCardTracker:initialize(player)
   self.draw_pile = createKnownCards()
   self.discard_pile = createKnownCards()
   self.processing_area = createKnownCards()
+  self.void = createKnownCards()
   self.draw_pile_order = {}
 end
 
@@ -49,6 +51,8 @@ function KnownCardTracker:getKnownCardsByArea(area, player, special_name)
     ret = self.draw_pile
   elseif area == Card.DiscardPile then
     ret = self.discard_pile
+  elseif area == Card.Void then
+    ret = self.void
   elseif table.contains(playerAreas, area) then
     assert(player ~= nil)
     local pid = player.id
