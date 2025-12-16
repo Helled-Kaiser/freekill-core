@@ -574,7 +574,8 @@ end
 ---@param ignore_dead? boolean @ 是否忽略尸体
 ---@param excludeIds? integer[] @ 忽略的自己装备的id列表，用于飞刀判定
 ---@param excludeSkills? string[] @ 忽略的技能名列表
-function Player:distanceTo(other, mode, ignore_dead, excludeIds, excludeSkills)
+---@param cardForUsing? Card @ 将会转化的牌
+function Player:distanceTo(other, mode, ignore_dead, excludeIds, excludeSkills, cardForUsing)
   assert(other:isInstanceOf(Player))
   mode = mode or "both"
   excludeSkills = excludeSkills or {}
@@ -624,8 +625,8 @@ function Player:distanceTo(other, mode, ignore_dead, excludeIds, excludeSkills)
   local status_skills = Fk:currentRoom().status_skills[DistanceSkill] or Util.DummyTable  ---@type DistanceSkill[]
   for _, skill in ipairs(status_skills) do
     if not table.contains(excludeSkills, skill.name) then
-      local fixed = skill:getFixed(self, other)
-      local correct = skill:getCorrect(self, other)
+      local fixed = skill:getFixed(self, other, cardForUsing)
+      local correct = skill:getCorrect(self, other, cardForUsing)
       if fixed ~= nil then
         ret = fixed
         break
@@ -666,8 +667,9 @@ end
 ---@param fixLimit? integer @ 卡牌距离限制增加专用
 ---@param excludeIds? integer[] @ 忽略的自己装备的id列表，用于飞刀判定
 ---@param excludeSkills? string[] @ 忽略的技能名列表
+---@param cardForUsing? Card @ 将会转化的牌
 ---@return boolean
-function Player:inMyAttackRange(other, fixLimit, excludeIds, excludeSkills)
+function Player:inMyAttackRange(other, fixLimit, excludeIds, excludeSkills, cardForUsing)
   assert(other:isInstanceOf(Player))
   if self == other or (other and (other.dead or other:isRemoved())) or self:isRemoved() then
     return false
@@ -702,7 +704,7 @@ function Player:inMyAttackRange(other, fixLimit, excludeIds, excludeSkills)
   end
 
   local baseAttackRange = self:getAttackRange(excludeIds, excludeSkills)
-  return self:distanceTo(other, nil, nil, excludeIds, excludeSkills) <= (baseAttackRange + fixLimit)
+  return self:distanceTo(other, nil, nil, excludeIds, excludeSkills, cardForUsing) <= (baseAttackRange + fixLimit)
 end
 
 --- 获取下家。
