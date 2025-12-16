@@ -961,7 +961,6 @@ end
 function Client:addNpc(data)
   ClientBase.addNpc(self, data)
   self.alive_players = table.filter(self.players, function(p) return not p.dead end)
-  print 'client new add npc'
 end
 
 return Client

@@ -97,7 +97,7 @@ GraphicsBox {
     Item { Layout.fillWidth: true }
     MetroButton {
       text: Lua.tr("Continue Game")
-      visible: !Config.observing && !Config.replaying && Config.serverEnableBot
+      visible: !Config.observing && !Config.replaying && Config.roomCapacity === 1
 
       onClicked: {
         Mediator.notify(root, Command.ContinueGame);

@@ -569,12 +569,6 @@ W.PageBase {
 
   function restartGame(sender) {
     loadPlayerData(sender);
-    //有人走了自动用机器人填充
-    for (let i = 0; i < playerNum; i++) {
-     if (!isFull) {
-       Cpp.notifyServer("AddRobot", "");
-     } 
-    }
     Cpp.notifyServer("StartGame", "");
   }
 
@@ -615,6 +609,7 @@ W.PageBase {
     roominfo.refresh();
 
     checkAllReady();
+    checkCanAddRobot();
     if (getPhoto(-1)) {
       isFull = false;
     } else {
