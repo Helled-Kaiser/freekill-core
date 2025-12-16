@@ -181,6 +181,9 @@ function MoveCards:main()
   end
 
   room:notifyMoveCards(nil, moveCardsData, self.id)
+  for _, p in ipairs(room.players) do
+    p.card_tracker:applyMoveDatas(moveCardsData)
+  end
 
   for _, v in ipairs(uninstalls) do
     local card, from = table.unpack(v)
@@ -366,6 +369,7 @@ function MoveEventWrappers:notifyMoveCards(players, moveDatas, event_id)
     for _, move in ipairs(moveDatas) do
 
       -- 在转成json传输之前先变一下
+      -- 主要还是因为QML还在用playerId
       local _data = rawget(move, "_data")
       local v = table.simpleClone(_data and _data or move)
       v.from = v.from and v.from.id

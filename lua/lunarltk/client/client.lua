@@ -550,6 +550,9 @@ function Client:moveCards(data)
       end
     end
   end
+  for _, p in ipairs(self.players) do
+    p.card_tracker:applyMoveDatas(raw_moves)
+  end
 
   local visible_data = {}
   for _, move in ipairs(raw_moves) do
@@ -603,6 +606,13 @@ function Client:showCard(data)
     from = src,
   }
   src = src or 0
+  local from = self:getPlayerById(src)
+  for _, p in ipairs(self.players) do
+    for _, id in ipairs(cards) do
+      p.card_tracker:setCardKnown(id, from, Card.PlayerHand)
+    end
+  end
+
   self:showVirtualCard({ fakeCards, src, msg, event_id })
 end
 

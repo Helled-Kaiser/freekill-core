@@ -1,6 +1,7 @@
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
 local basePlayer = require "core.player"
+local KnownCardTracker = require "lunarltk.core.known_card_tracker"
 
 --- 玩家分为客户端要处理的玩家，以及服务端处理的玩家两种。
 ---
@@ -30,6 +31,7 @@ local basePlayer = require "core.player"
 ---@field public player_cards table<integer, integer[]> @ 当前拥有的所有牌，键是区域，值是id列表
 ---@field public virtual_equips Card[] @ 当前的虚拟装备牌，其实也包含着虚拟延时锦囊这种
 ---@field public special_cards table<string, integer[]> @ 类似“屯田”的“田”的私人牌堆
+---@field public card_tracker KnownCardTracker @ 记牌器
 ---@field public cardUsedHistory table<string, integer[]> @ 用牌次数历史记录
 ---@field public skillUsedHistory table<string, integer[]> @ 发动技能次数的历史记录
 ---@field public skillBranchUsedHistory table<string, table<string, integer[]>> @ 发动技能某分支次数的历史记录
@@ -109,6 +111,7 @@ function Player:initialize()
   }
   self.special_cards = {}
   self.virtual_equips = {}
+  self.card_tracker = KnownCardTracker:new(self)
 
   self.equipSlots = {
     Player.WeaponSlot,
@@ -1617,10 +1620,13 @@ function Player:cardVisible(cardId, move, toChoose)
   local falsy = true -- 当难以决定时是否要选择暗置？
   local oldarea, oldspecial, oldowner
   if move then
-    move = table.simpleClone(move)
-    -- 把playerId转为Player
-    if type(move.to) == "number" then move.to = room:getPlayerById(move.to) end
-    if type(move.from) == "number" then move.from = room:getPlayerById(move.from) end
+    if not move.class then
+      move = table.simpleClone(move)
+      -- 把playerId转为Player
+      if type(move.to) == "number" then move.to = room:getPlayerById(move.to) end
+      if type(move.from) == "number" then move.from = room:getPlayerById(move.from) end
+    end
+
     ---@type MoveInfo
     local info = table.find(move.moveInfo, function(info) return info.cardId == cardId end)
     if info then
