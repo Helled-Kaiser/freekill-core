@@ -1332,6 +1332,7 @@ end
 function Room:askToChooseCards(player, params)
   local target, flag, reason, prompt = params.target, params.flag, params.skill_name, params.prompt
   local min, max = params.min, params.max
+  params.cancelable = not not params.cancelable
   if min == 1 and max == 1 and not params.cancelable and not params.pattern then
     return { self:askToChooseCard(player, params) }
   end
@@ -1387,7 +1388,7 @@ function Room:askToChooseCards(player, params)
     poxi_type = "AskForCardsChosen",
     data = cards_data,
     extra_data = data,
-    cancelable = params.cancelable == nil and false or params.cancelable
+    cancelable = params.cancelable
   }
 
   local ret = self:askToPoxi(player, poxiParams)
