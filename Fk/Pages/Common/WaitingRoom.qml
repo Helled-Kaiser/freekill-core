@@ -567,6 +567,17 @@ W.PageBase {
     checkAllReady();
   }
 
+  function restartGame(sender) {
+    loadPlayerData(sender);
+    //有人走了自动用机器人填充
+    for (let i = 0; i < playerNum; i++) {
+     if (!isFull) {
+       Cpp.notifyServer("AddRobot", "");
+     } 
+    }
+    Cpp.notifyServer("StartGame", "");
+  }
+
   function startGame() {
     canKickOwner = false;
     kickOwnerTimer.stop();
@@ -623,6 +634,7 @@ W.PageBase {
 
     addCallback(Command.StartGame, startGame);
     addCallback(Command.BackToRoom, loadPlayerData);
+    addCallback(Command.RestartGame, restartGame);
 
     addCallback(Command.ChangeRoom, changeRoomConfig);
 
