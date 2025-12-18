@@ -325,7 +325,8 @@ local function separateMoves(moves)
         moveReason = move.moveReason,
         specialName = move.specialName,
         fromSpecialName = info.fromSpecialName,
-        proposer = move.proposer
+        proposer = move.proposer,
+        drawPilePosition = move.drawPilePosition,
       })
     end
   end
@@ -351,6 +352,7 @@ local function mergeMoves(moves)
         specialName = move.specialName,
         fromSpecialName = move.fromSpecialName,
         proposer = move.proposer,
+        drawPilePosition = move.drawPilePosition,
       }
     end
     -- table.insert(temp[info].ids, move.moveVisible and move.ids[1] or -1)
@@ -489,13 +491,24 @@ local function sendMoveCardLog(move, visible_data)
         })
       end
     end
-  elseif move.from and move.toArea == Card.DrawPile then
-    msgtype = hidden and "$PutCard" or "$PutKnownCard"
+  elseif move.toArea == Card.DrawPile then
+    msgtype = move.from and "$PutCard" or "$PutCardNoFrom"
+    local pos = move.drawPilePosition
+    local arg
+    if pos == nil or pos == 1 then
+      arg = "Top"
+    elseif pos == -1 then
+      arg = "Bottom"
+    else
+      arg = "Pile"
+    end
+
     client:appendLog({
       type = msgtype,
       from = move.from,
       card = logCards,
-      arg = #move.ids,
+      arg = arg,
+      arg2 = #move.ids,
     }, visible_data)
     client:setCardNote(move.ids, {
       type = "$$PutCard",
