@@ -676,8 +676,8 @@ Fk:loadTranslationTable {
 
   ["$AddToPile"] = "%arg2 张牌 %card 被作为 %from 的 %arg 移出游戏",
 
-  ["$PutCard"] = "%from 的 %arg 张牌被置于牌堆",
-  ["$PutKnownCard"] = "%from 的牌 %card 被置于牌堆",
+  ["$PutCard"] = "%from 的 %arg2 张牌 %card 被置于 %arg",
+  ["$PutCardNoFrom"] = "%arg2 张牌 %card 被置于 %arg",
   ["$DiscardCards"] = "%from 弃置了 %arg 张牌 %card",
   ["$DiscardOther"] = "%to 弃置了 %from 的 %arg 张牌 %card",
   ["$PutToDiscard"] = "%arg 张牌 %card 被置入弃牌堆",

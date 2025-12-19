@@ -325,7 +325,8 @@ local function separateMoves(moves)
         moveReason = move.moveReason,
         specialName = move.specialName,
         fromSpecialName = info.fromSpecialName,
-        proposer = move.proposer
+        proposer = move.proposer,
+        drawPilePosition = move.drawPilePosition,
       })
     end
   end
@@ -351,6 +352,7 @@ local function mergeMoves(moves)
         specialName = move.specialName,
         fromSpecialName = move.fromSpecialName,
         proposer = move.proposer,
+        drawPilePosition = move.drawPilePosition,
       }
     end
     -- table.insert(temp[info].ids, move.moveVisible and move.ids[1] or -1)
@@ -489,13 +491,24 @@ local function sendMoveCardLog(move, visible_data)
         })
       end
     end
-  elseif move.from and move.toArea == Card.DrawPile then
-    msgtype = hidden and "$PutCard" or "$PutKnownCard"
+  elseif move.toArea == Card.DrawPile then
+    msgtype = move.from and "$PutCard" or "$PutCardNoFrom"
+    local pos = move.drawPilePosition
+    local arg
+    if pos == nil or pos == 1 then
+      arg = "Top"
+    elseif pos == -1 then
+      arg = "Bottom"
+    else
+      arg = "Pile"
+    end
+
     client:appendLog({
       type = msgtype,
       from = move.from,
       card = logCards,
-      arg = #move.ids,
+      arg = arg,
+      arg2 = #move.ids,
     }, visible_data)
     client:setCardNote(move.ids, {
       type = "$$PutCard",
@@ -550,6 +563,9 @@ function Client:moveCards(data)
       end
     end
   end
+  for _, p in ipairs(self.players) do
+    p.card_tracker:applyMoveDatas(raw_moves)
+  end
 
   local visible_data = {}
   for _, move in ipairs(raw_moves) do
@@ -603,6 +619,15 @@ function Client:showCard(data)
     from = src,
   }
   src = src or 0
+  local from = self:getPlayerById(src)
+  if from then
+    for _, p in ipairs(self.players) do
+      for _, id in ipairs(cards) do
+        p.card_tracker:setCardKnown(id, from, Card.PlayerHand)
+      end
+    end
+  end
+
   self:showVirtualCard({ fakeCards, src, msg, event_id })
 end
 

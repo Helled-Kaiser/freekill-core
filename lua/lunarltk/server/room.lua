@@ -3711,6 +3711,13 @@ function Room:showCards(cards, from, proposer)
     from = src,
     card = cards,
   }
+  if from then
+    for _, p in ipairs(self.players) do
+      for _, id in ipairs(cards) do
+        p.card_tracker:setCardKnown(id, from, Card.PlayerHand)
+      end
+    end
+  end
 
   --[[ -- 原版
 
@@ -3722,7 +3729,7 @@ function Room:showCards(cards, from, proposer)
     type = "##ShowCard",
     from = src,
   })
-  
+
   --]]
 
   local n = 0
