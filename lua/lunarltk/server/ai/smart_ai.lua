@@ -44,7 +44,10 @@ end
 ---@param skill_name string
 ---@return T?
 function SmartAI:findStrategyOfSkill(tp, skill_name)
-  local skel = Fk.skills[skill_name]:getSkeleton()
+  local skill = Fk.skills[skill_name]
+  if not skill then return end
+  local skel = skill:getSkeleton()
+  if not skel then return end
   local list = skel.ai_strategies[tp] or Util.DummyTable
   for _, v in ipairs(list) do
     if v:matchContext(self) then
