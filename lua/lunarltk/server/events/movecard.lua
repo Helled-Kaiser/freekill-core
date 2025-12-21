@@ -133,8 +133,6 @@ function MoveCards:main()
           table.insert(uninstalls, {info.beforeCard, data.from})
         end
 
-        Fk:filterCard(info.cardId, data.to)
-
         local currentCard = Fk:getCardById(info.cardId) --[[@as EquipCard]]
         for name, value in pairs(currentCard.mark) do
           if name:find("-inhand", 1, true) and
@@ -158,6 +156,8 @@ function MoveCards:main()
             room:setCardMark(currentCard, mark[1], mark[2])
           end
         end
+
+        Fk:filterCard(info.cardId, data.to)
 
         -- FIXME: 随便擦了几下 等设计师亲手鉴定
         local realCurrentCard = Fk:getCardById(info.cardId, true)
