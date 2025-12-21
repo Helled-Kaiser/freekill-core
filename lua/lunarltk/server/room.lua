@@ -1414,6 +1414,13 @@ end
 ---@param params AskToChoiceParams @ 各种变量
 ---@return string @ 选择的选项
 function Room:askToChoice(player, params)
+  local choices = params.choices
+  if params.cancelable then
+    table.insertIfNeed(choices, "Cancel")
+    if params.all_choices then
+      table.insertIfNeed(params.all_choices, "Cancel")
+    end
+  end
   if #params.choices == 1 and not params.all_choices then return params.choices[1] end
   assert(not params.all_choices or table.every(params.choices, function(c) return table.contains(params.all_choices, c) end))
   local command = "AskForChoice"
