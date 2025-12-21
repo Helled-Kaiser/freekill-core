@@ -116,7 +116,7 @@ function MoveCards:main()
     room.logic:breakEvent()
   end
 
-  local uninstalls, installs = {}, {}
+  local uninstalls, installs, filtercards = {}, {}, {}
 
   for _, data in ipairs(moveCardsData) do
     if #data.moveInfo > 0 then
@@ -157,7 +157,7 @@ function MoveCards:main()
           end
         end
 
-        Fk:filterCard(info.cardId, data.to)
+        table.insert(filtercards, {info.cardId, data.to})
 
         -- FIXME: 随便擦了几下 等设计师亲手鉴定
         local realCurrentCard = Fk:getCardById(info.cardId, true)
@@ -193,6 +193,11 @@ function MoveCards:main()
   for _, v in ipairs(installs) do
     local card, to = table.unpack(v)
     card:onInstall(room, to)
+  end
+
+  for _, v in ipairs(filtercards) do
+    local id, to = table.unpack(v)
+    Fk:filterCard(id, to)
   end
 
   room.logic:trigger(fk.AfterCardsMove, nil, moveCardsData)
