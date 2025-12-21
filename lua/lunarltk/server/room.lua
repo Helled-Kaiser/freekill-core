@@ -1331,8 +1331,8 @@ end
 ---@return integer[] @ 选择的id
 function Room:askToChooseCards(player, params)
   local target, flag, reason, prompt = params.target, params.flag, params.skill_name, params.prompt
-  local min, max = params.min, params.max
   params.cancelable = not not params.cancelable
+  local min, max = params.min, params.max
   if min == 1 and max == 1 and not params.cancelable and not params.pattern then
     return { self:askToChooseCard(player, params) }
   end

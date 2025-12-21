@@ -77,4 +77,10 @@ skill:addTest(function(room, me)
   lu.assertEquals(#room.players[3]:getCardIds("h"), 1)
 end)
 
+skill:addAI(Fk.Ltk.AI.newCardSkillStrategy {
+  keep_value = -1,
+  use_value = 3,
+  use_priority = 1.2,
+})
+
 return skill
