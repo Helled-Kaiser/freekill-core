@@ -52,7 +52,7 @@ skill:addEffect("cardskill", {
   end,
   on_effect = function(self, room, effect)
     local to = effect.to
-    if not (effect.extra_data and effect.extra_data.AGFilled) then
+    if not (effect.extra_data and next(effect.extra_data.AGFilled or {})) then
       return
     end
 
