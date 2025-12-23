@@ -168,7 +168,8 @@ function General:addCompanions(name)
   if type(name) == "table" then
     table.insertTable(self.companions, name)
   elseif type(name) == "string" then
-    table.insert(self.companions, name)
+    local arg = string.split(name, "__")
+    table.insert(self.companions, arg[#arg])
   end
 end
 
@@ -178,7 +179,7 @@ end
 function General:isCompanionWith(other)
   assert(other:isInstanceOf(General))
   if self == other then return false end
-  return table.contains(self.companions, other.name) or table.contains(other.companions, self.name)
+  return table.contains(self.companions, other.trueName) or table.contains(other.companions, self.trueName)
     or (not not string.find(self.name, "lord") and (other.kingdom == self.kingdom or other.subkingdom == self.kingdom))
     or (not not string.find(other.name, "lord") and (self.kingdom == other.kingdom or self.subkingdom == other.kingdom))
     or (not not string.find(self.name, "all_comp") or not not string.find(other.name, "all_comp")) -- all_comp 所有都珠联璧合
