@@ -50,11 +50,13 @@ skill:addEffect("cardskill", {
       use.extra_data.AGFilled = nil
     end
   end,
+  about_to_effect = function(self, room, effect)
+    if not (effect.extra_data and next(effect.extra_data.AGFilled or {})) then
+      return true
+    end
+  end,
   on_effect = function(self, room, effect)
     local to = effect.to
-    if not (effect.extra_data and next(effect.extra_data.AGFilled or {})) then
-      return
-    end
 
     local chosen = room:askToAG(to, { id_list = effect.extra_data.AGFilled, cancelable = false, skill_name = self.name })
     room:takeAG(to, chosen, room.players)
