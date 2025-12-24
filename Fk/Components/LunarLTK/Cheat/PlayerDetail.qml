@@ -301,7 +301,10 @@ Flickable {
             + Lua.tr(v.name) + "</b>: " + Lua.tr(":" + v.name)
           );
         } else {
-          skillDesc.append("<b>" + Lua.tr(t.name) + "</b>: " + Lua.tr(":" + t.name));
+          skillDesc.append(
+            "<b>" + Lua.tr(t.name) + "(" + Lua.tr("log_" + t.suit) + Lua.tr(t.number.toString()) + ")"
+            + "</b>: " + Lua.tr(":" + t.name)
+          );
         }
       } else {
         unknownCardsNum++;
