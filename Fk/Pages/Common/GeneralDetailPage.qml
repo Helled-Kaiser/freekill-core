@@ -632,6 +632,7 @@ Item {
               scale: 1; transformOrigin: Item.TopLeft
 
               onClicked: {
+                drawerBar.currentIndex = 0;
                 root.changeGeneralDetailInside(modelData)
               }
             }

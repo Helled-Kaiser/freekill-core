@@ -71,10 +71,7 @@ Item {
       
       Repeater {
         id: skinsRepeater
-        model: {
-          const safeList = Array.isArray(extra_data.skins) ? extra_data.skins : [];
-          return extra_data.orig_general ? [extra_data.orig_general, ...safeList] : [...safeList];
-        }
+        model: [extra_data.orig_general].concat(extra_data.skins ?? [])
 
         SkinItem {
           source: {
@@ -148,10 +145,7 @@ Item {
       spacing: 6
       Repeater {
         id: deputySkinsRepeater
-        model: {
-          const safeList = Array.isArray(extra_data.deputy_skins) ? extra_data.deputy_skins : [];
-          return extra_data.orig_deputy ? [extra_data.orig_deputy, ...safeList] : [...safeList];
-        }
+        model: [extra_data.orig_deputy].concat(extra_data.deputy_skins ?? [])
 
         SkinItem {
           source: {
