@@ -297,6 +297,7 @@ FreeKill使用的是libgit2的C API，与此同时使用Git完成拓展包的下
   ["Skill Name"] = "技能名称",
   ["Skill Description"] = "技能描述",
   ["Audio Text"] = "语音文本",
+  ["Other Same Name Generals"] = "其他同名武将",
   ["Death audio"] = "阵亡",
   ["Win audio"] = "胜利",
   ["Official"] = "官方",

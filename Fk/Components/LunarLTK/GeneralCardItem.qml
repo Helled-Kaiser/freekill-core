@@ -69,11 +69,13 @@ Game.BasicCard {
   Component {
     id: duelkingdomMagatama
     Item {
-      width: childrenRect.width
-      height: childrenRect.height
+      width: 10
+      height: 10 / childrenRect.width * childrenRect.height
       Image {
         id: mainMagatama
         source: SkinBank.getGeneralCardDir(root.kingdom) + root.kingdom + "-magatama"
+        width: 10
+        height: 10 / sourceSize.width * sourceSize.height
         visible: !root.subkingdom
       }
       LinearGradient {
@@ -95,6 +97,8 @@ Game.BasicCard {
       Image {
         id: subkingdomMagatama
         visible: false
+        width: 10
+        height: 10 / sourceSize.width * sourceSize.height
         source: root.subkingdom ? SkinBank.getGeneralCardDir(root.subkingdom) +
                              root.subkingdom + "-magatama" : ""
       }
@@ -122,7 +126,10 @@ Game.BasicCard {
       width: childrenRect.width
       height: childrenRect.height
       Image {
+        id: singleMagatamaImg
         source: SkinBank.getGeneralCardDir(root.kingdom) + root.kingdom + "-magatama"
+        width: 10
+        height: 10 / sourceSize.width * sourceSize.height
       }
     }
   }
