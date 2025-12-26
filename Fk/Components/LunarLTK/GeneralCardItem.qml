@@ -46,19 +46,25 @@ Game.BasicCard {
                      name.includes('heg__')
 
   Image {
+    anchors.fill: parent
+    anchors.margins: -1
+    fillMode: Image.PreserveAspectFit
     source: parent.known ? (SkinBank.generalCardDir + "border") : ""
   }
 
   Image {
     scale: parent.subkingdom ? 0.6 : 1
     width: 34; fillMode: Image.PreserveAspectFit
-    transformOrigin: Item.TopLeft
+    anchors.top: parent.top
+    anchors.topMargin: parent.subkingdom ? -7 : -2
+    anchors.left: parent.left
+    anchors.leftMargin: parent.subkingdom ? -8 : -2
     source: SkinBank.getGeneralCardDir(parent.kingdom) + parent.kingdom
     visible: parent.detailed && parent.known
   }
 
   Image {
-    scale: 0.6; x: 9; y: 12
+    scale: 0.6; x: 8; y: 12
     transformOrigin: Item.TopLeft
     width: 34; fillMode: Image.PreserveAspectFit
     source: parent.subkingdom ? SkinBank.getGeneralCardDir(parent.subkingdom) + parent.subkingdom
@@ -135,8 +141,8 @@ Game.BasicCard {
   }
 
   Row {
-    x: 34
-    y: 4
+    id: magatamaRow
+    x: 34; y: 4
     spacing: 1
     visible: parent.detailed && parent.known && !parent.heg
     Repeater {
@@ -144,15 +150,19 @@ Game.BasicCard {
       model: (!root.heg) ? ((root.hp > 5 || root.hp !== root.maxHp) ? 1 : root.hp) : 0
       delegate: root.subkingdom ? duelkingdomMagatama : singlekingdomMagatama
     }
+  }
 
-    Text {
-      visible: root.hp > 5 || root.hp !== root.maxHp
-      text: root.hp === root.maxHp ? ("x" + root.hp) : (" " + root.hp + "/" + root.maxHp)
-      color: "white"
-      font.pixelSize: 14
-      style: Text.Outline
-      y: -6
-    }
+  Text {
+    anchors.left: magatamaRow.right
+    anchors.leftMargin: -1
+    visible: root.hp > 5 || root.hp !== root.maxHp
+    text: root.hp === root.maxHp ? (" x" + root.hp) : (" " + root.hp + "/" + root.maxHp)
+    color: "white"
+    font.family: Config.libianName
+    font.pixelSize: 14
+    font.bold: true
+    style: Text.Outline
+    y: 1
   }
 
   Row {
@@ -217,18 +227,27 @@ Game.BasicCard {
     anchors.horizontalCenter: parent.horizontalCenter
     y: 80
   }
+  
+  Glow {
+    source: generalName
+    anchors.fill: generalName
+    color: "black"
+    spread: 0.3
+    radius: 5
+  }
 
   Text {
+    id: generalName
     width: 20
     height: 80
     x: 3
-    y: lineCount > 4 ? 30 : 34
+    y: lineCount > 4 ? 28 : 30
     text: name !== "" ? Lua.tr(name) : "nil"
     visible: detailed && known
     color: "white"
     font.family: "LiSu"
     font.pixelSize: 18
-    lineHeight: Math.max(1.4 - lineCount / 8, 0.8)
+    lineHeight: Math.max(1.25 - lineCount / 8, 0.8)
     style: Text.Outline
     wrapMode: Text.WrapAnywhere
   }
@@ -236,27 +255,35 @@ Game.BasicCard {
   Rectangle {
     visible: pkgName !== "" && detailed && known
     height: 16
-    width: childrenRect.width + 4
+    width: childrenRect.width + 15
     anchors.bottom: parent.bottom
-    anchors.bottomMargin: 4
     anchors.right: parent.right
-    anchors.rightMargin: 4
 
-    color: "#3C3229"
-    opacity: 0.8
-    radius: 4
-    border.color: "white"
-    border.width: 1
+    color: "transparent"
+
+    gradient: Gradient {
+      orientation: Gradient.Horizontal
+      GradientStop {
+        position: 0
+        color: Qt.rgba(0, 0, 0, 0)
+      }
+      GradientStop {
+        position: 1
+        color: Qt.rgba(0, 0, 0, 1)
+      }
+    }
     Text {
       text: Lua.tr(pkgName)
-      x: 2; y: 1
+      x: 13; y: 1
       font.family: Config.libianName
       font.pixelSize: 14
       color: "white"
       style: Text.Outline
       textFormat: Text.RichText
+      width: contentWidth
     }
   }
+
 
   onNameChanged: {
     const data = Lua.call("GetGeneralData", name);
