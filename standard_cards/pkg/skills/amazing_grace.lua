@@ -62,7 +62,9 @@ skill:addEffect("cardskill", {
     room:takeAG(to, chosen, room.players)
     table.insert(effect.extra_data.AGResult, {effect.to.id, chosen})
     room:moveCardTo(chosen, Card.PlayerHand, effect.to, fk.ReasonPrey, self.name, nil, true, effect.to)
-    table.removeOne(effect.extra_data.AGFilled, chosen)
+    effect.extra_data.AGFilled = table.filter(effect.extra_data.AGFilled, function(id)
+      return room:getCardArea(id) == Card.Processing
+    end)
   end,
 })
 
