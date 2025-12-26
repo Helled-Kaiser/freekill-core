@@ -5,9 +5,8 @@ import QtQuick
 import Fk
 import Fk.Components.LunarLTK
 import Fk.Widgets as W
-import Fk.Pages
-import Fk.RoomElement
 import Fk.Components.Common
+import Qt5Compat.GraphicalEffects
 
 Item {
   id: root
@@ -19,13 +18,46 @@ Item {
 
   anchors.fill: parent
 
-  BigGlowText {
+  Item {
     id: title
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     height: childrenRect.height + 4
 
-    text: "皮肤选择"
+    GlowText {
+      id: pileName
+      text: "皮肤选择"
+      horizontalAlignment: Text.AlignHCenter
+      width: parent.width
+      font.family: "LiSu"
+      color: "#E4D5A0"
+      font.pixelSize: 30
+      font.weight: Font.Medium
+      glow.color: "black"
+      glow.spread: 0.3
+      glow.radius: 5
+    }
+
+    LinearGradient  {
+      anchors.fill: pileName
+      source: pileName
+      gradient: Gradient {
+        GradientStop {
+          position: 0
+          color: "#FEF7C2"
+        }
+
+        GradientStop {
+          position: 0.5
+          color: "#D2AD4A"
+        }
+
+        GradientStop {
+          position: 1
+          color: "#BE9878"
+        }
+      }
+    }
   }
 
   Rectangle {
@@ -62,7 +94,7 @@ Item {
     anchors.right: root.right
     contentWidth: skinRow.width
     contentHeight: skinRow.height + 25
-    visible: skinsRepeater.count > 0 && extra_data.orig_general
+    visible: !!(skinsRepeater.count > 0 && extra_data.orig_general)
     clip: true
 
     Row {
@@ -137,7 +169,7 @@ Item {
     height: contentHeight
     contentWidth: deputySkinRow.width
     contentHeight: deputySkinRow.height + 25
-    visible: deputySkinsRepeater.count > 0 && extra_data.orig_deputy
+    visible: !!(deputySkinsRepeater.count > 0 && extra_data.orig_deputy)
     clip: true
 
     Row {
