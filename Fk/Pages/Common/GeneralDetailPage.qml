@@ -602,7 +602,7 @@ Item {
 
       Flickable {
         clip: true
-        contentHeight: audioLayout.height
+        contentHeight: otherText.height
         TextEdit {
           id: otherText
           width: parent.width - 4
@@ -619,8 +619,9 @@ Item {
 
       Flickable {
         clip: true
-        contentHeight: audioLayout.height
+        contentHeight: otherSameLayout.height
         GridLayout {
+          id: otherSameLayout
           columns: 5
           columnSpacing: 5
           rowSpacing: 5
