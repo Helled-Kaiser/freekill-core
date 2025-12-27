@@ -464,12 +464,12 @@ local function sendMoveCardLog(move, visible_data)
       from = move.to,
       card = logCards,
     }, visible_data)
-  elseif move.fromArea == Card.PlayerEquip then
-    client:appendLog({
-      type = "$UninstallEquip",
-      from = move.from,
-      card = logCards,
-    }, visible_data)
+  --elseif move.fromArea == Card.PlayerEquip then
+  --  client:appendLog({
+  --    type = "$UninstallEquip",
+  --    from = move.from,
+  --    card = logCards,
+  --  }, visible_data)
   elseif move.toArea == Card.Processing then
     if move.fromArea == Card.DrawPile and (move.moveReason == fk.ReasonPut or move.moveReason == fk.ReasonJustMove) then
       if hidden then
@@ -495,9 +495,10 @@ local function sendMoveCardLog(move, visible_data)
     msgtype = move.from and "$PutCard" or "$PutCardNoFrom"
     local pos = move.drawPilePosition
     local arg
-    if pos == nil or pos == 1 then
-      arg = "Top"
-    elseif pos == -1 then
+    --if pos == nil or pos == 1 then
+    --  arg = "Top"
+    --elseif pos == -1 then
+    if pos == -1 then
       arg = "Bottom"
     else
       arg = "Pile"
