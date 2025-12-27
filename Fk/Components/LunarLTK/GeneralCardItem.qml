@@ -34,6 +34,7 @@ Game.BasicCard {
   property int inPosition: 0
   property string pkgName: ""
   property bool detailed: true
+  property bool showIsFavorite: true
   property alias hasCompanions: companions.visible
 
   footnote: ""
@@ -255,7 +256,7 @@ Game.BasicCard {
   Rectangle {
     visible: pkgName !== "" && detailed && known
     height: 16
-    width: childrenRect.width + 15
+    width: pkgNameText.width + 15
     anchors.bottom: parent.bottom
     anchors.right: parent.right
 
@@ -268,11 +269,16 @@ Game.BasicCard {
         color: Qt.rgba(0, 0, 0, 0)
       }
       GradientStop {
+        position: 0.35
+        color: Qt.rgba(0, 0, 0, 0.5)
+      }
+      GradientStop {
         position: 1
         color: Qt.rgba(0, 0, 0, 1)
       }
     }
     Text {
+      id: pkgNameText
       text: Lua.tr(pkgName)
       x: 13; y: 1
       font.family: Config.libianName
@@ -280,10 +286,52 @@ Game.BasicCard {
       color: "white"
       style: Text.Outline
       textFormat: Text.RichText
-      width: contentWidth
+      width: implicitWidth
     }
   }
 
+  Item {
+    visible: Config.favoriteGenerals.includes(parent.name) && parent.showIsFavorite
+    width: 15; height: 15
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.margins: 1
+    Canvas {
+      id: starCanvas
+      anchors.fill: parent
+      onPaint: {
+        var ctx = getContext("2d");
+        ctx.reset();
+        var cx = width/2;
+        var cy = height/2;
+        var spikes = 5;
+        var outerRadius = Math.min(width, height) * 0.45;
+        var innerRadius = outerRadius * 0.45;
+        var rot = -Math.PI/2; // start at top
+        ctx.beginPath();
+        for (var i = 0; i < spikes; i++) {
+          var x = cx + Math.cos(rot) * outerRadius;
+          var y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += Math.PI / spikes;
+
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += Math.PI / spikes;
+        }
+        ctx.closePath();
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "white";
+        ctx.stroke();
+      }
+      Component.onCompleted: requestPaint()
+      onWidthChanged: requestPaint()
+      onHeightChanged: requestPaint()
+    }
+  }
 
   onNameChanged: {
     const data = Lua.call("GetGeneralData", name);
