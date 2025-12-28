@@ -82,6 +82,15 @@ _skill:addAI(Fk.Ltk.AI.newDiscardStrategy {
     local min_num = data.min_num
 
     ai:sortCards(available_cards, "keep_value")
+    if ai._debug then
+      verbose(0, "[默认弃牌AI] 已完成卡牌的排序，排序后的卡牌为%s", table.concat(
+        table.map(available_cards, function(id)
+          local cd = Fk:getCardById(id)
+          local log = cd:toLogString()
+          local v = ai:getKeepValue(id)
+          return ("%s(id=%s, v=%s)"):format(log, id, v)
+        end), ","))
+    end
     -- TODO: 收益忘了，乱写的
     return table.slice(available_cards, 1, min_num + 1), -10 * min_num
   end,

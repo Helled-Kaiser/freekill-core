@@ -26,7 +26,9 @@ function CardSkillStrategy:think(ai)
   for _, cid in ipairs(cards) do
     ai:selectCard(cid, true)
     local ret, val = self:chooseTargets(ai)
-    verbose(1, "就目前选择的这张牌，考虑[%s]，收益为%g", table.concat(table.map(ret, function(p)return tostring(p)end), "+"), val)
+    if ai._debug then
+      verbose(1, "就目前选择的这张牌，考虑[%s]，收益为%g", table.concat(table.map(ret, function(p)return tostring(p)end), "+"), val)
+    end
     val = val or -100000
     if best_val < val then
       best_ret, best_val = ret, val
@@ -67,7 +69,9 @@ function CardSkillStrategy:chooseTargets(ai)
       tos = targets,
       card = ai:getSelectedCard(),
     })
-    verbose(1, "目前状况下，对[%s]的预测收益为%g", table.concat(table.map(targets, function(p)return tostring(p)end), "+"), logic.benefit)
+    if ai._debug then
+      verbose(1, "目前状况下，对[%s]的预测收益为%g", table.concat(table.map(targets, function(p)return tostring(p)end), "+"), logic.benefit)
+    end
     return logic.benefit
   end
   local best_targets, best_val = nil, -100000

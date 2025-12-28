@@ -9,13 +9,13 @@ function ChoosePlayerStrategy:chooseCards(ai)
 end
 
 ---@param ai SmartAI
----@return PlayerId[]?, number?
+---@return ServerPlayer[]?, number?
 function ChoosePlayerStrategy:choosePlayers(ai)
 end
 
 ---@param spec {
 ---  choose_cards?: (fun(self: AI.ChoosePlayerStrategy, ai: SmartAI): integer[]?, number?),
----  choose_players?: (fun(self: AI.ChoosePlayerStrategy, ai: SmartAI): PlayerId[]?, number?),
+---  choose_players?: (fun(self: AI.ChoosePlayerStrategy, ai: SmartAI): ServerPlayer[]?, number?),
 ---}
 ---@return AI.ChoosePlayerStrategy
 local function newChoosePlayerStrategy(spec)

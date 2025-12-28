@@ -74,12 +74,11 @@ exChooseSkill:addAI(Fk.Ltk.AI.newActiveStrategy {
 exChooseSkill:addAI(Fk.Ltk.AI.newChooseCardsAndPlayersStrategy {
   choose_cards = function (self, ai)
     local data = ai.data[4] -- extra_data
-    local available_players = ai:getEnabledCards()
+    local available_cards = ai:getEnabledCards()
 
     if ai.data[3] --[[ cancelable ]] or data.min_c_num == 0 then return {}, 0 end
 
-    table.shuffle(available_players) -- 随机选择以视高深莫测
-    return table.slice(available_players, data.min_c_num, data.max_c_num), 0
+    return table.random(available_cards, data.min_c_num), 0
   end,
   choose_players = function(self, ai)
     local data = ai.data[4] -- extra_data
@@ -87,8 +86,7 @@ exChooseSkill:addAI(Fk.Ltk.AI.newChooseCardsAndPlayersStrategy {
 
     if ai.data[3] --[[ cancelable ]] or data.min_t_num == 0 then return {}, 0 end
 
-    table.shuffle(available_players) -- 随机选择以视高深莫测
-    return table.map(table.slice(available_players, data.min_t_num, data.max_t_num), Util.IdMapper), 0
+    return table.random(available_players, data.min_t_num), 0
   end
 })
 

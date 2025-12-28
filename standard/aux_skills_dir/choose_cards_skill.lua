@@ -55,8 +55,7 @@ skill:addAI(Fk.Ltk.AI.newCardsStrategy {
 
     if ai.data[3] --[[ cancelable ]] then return {}, 0 end
 
-    table.shuffle(available_cards) -- 随机选择以视高深莫测
-    return table.slice(available_cards, 1, data.min_num + 1), 0
+    return table.random(available_cards, data.min_num), 0
   end
 })
 

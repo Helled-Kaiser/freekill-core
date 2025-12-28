@@ -44,8 +44,7 @@ distributionSelectSkill:addAI(Fk.Ltk.AI.newYijiStrategy {
 
     if ai.data[3] --[[ cancelable ]] or data.pattern == "" then return {}, 0 end
 
-    table.shuffle(available_cards) -- 随机选择以视高深莫测
-    return table.slice(available_cards, 1, data.max_num), 0
+    return table.random(available_cards, data.max_num), 0
   end,
   choose_players = function(self, ai)
     local data = ai.data[4] -- extra_data
@@ -53,8 +52,7 @@ distributionSelectSkill:addAI(Fk.Ltk.AI.newYijiStrategy {
 
     if ai.data[3] --[[ cancelable ]] then return {}, 0 end
 
-    table.shuffle(available_players) -- 随机选择以视高深莫测
-    return table.map(table.slice(available_players, 1, 1), Util.IdMapper), 0
+    return table.random(available_players, 1), 0
   end
 })
 

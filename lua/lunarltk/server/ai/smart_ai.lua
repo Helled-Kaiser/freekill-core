@@ -62,7 +62,9 @@ SmartAI:setSkillAI("__card_skill", {
         tos = targets,
         card = ai:getSelectedCard(),
       })
-      verbose(1, "目前状况下，对[%s]的预测收益为%g", table.concat(table.map(targets, function(p)return tostring(p)end), "+"), logic.benefit)
+      if self._debug then
+        verbose(1, "目前状况下，对[%s]的预测收益为%g", table.concat(table.map(targets, function(p)return tostring(p)end), "+"), logic.benefit)
+      end
       return logic.benefit
     end
     local best_targets, best_val = nil, -100000
@@ -112,9 +114,13 @@ function SmartAI:handleAskForUseActiveSkill()
   end
   if not ai then return "" end
   local _dbg_skill = ai.skill and ai.skill.name or "unknown"
-  verbose(1, "正在询问技能：%s", _dbg_skill)
+  if self._debug then
+    verbose(1, "正在询问技能：%s", _dbg_skill)
+  end
   local ret, real_val = ai:makeReply(self)
-  verbose(1, "%s: 思考结果是%s, 收益是%s", _dbg_skill, json.encode(ret), json.encode(real_val))
+  if self._debug then
+    verbose(1, "%s: 思考结果是%s, 收益是%s", _dbg_skill, json.encode(ret), json.encode(real_val))
+  end
   return ret, real_val
 end
 
@@ -124,6 +130,7 @@ end
 -- 2. (TODO) 为可以点击的卡牌转化技确定要转化的牌名 然后将该单一牌名纳入下一步那种牌名的考虑内
 -- 3. 将可用卡牌和技能按优先级排序，根据之前推测出的趋向，某些卡牌/技能的优先级会被修正
 -- 4. 计算优先级最高的3个卡牌/技能的方案及其收益
+--  * 收益值也会被意向值修正
 --  * 如果都为负收益则顺延直到有3个正收益选项
 --  * 如果依然全部为负收益则与直接点击取消键的收益进行权衡
 -- 5. 返回收益最高者
@@ -139,6 +146,9 @@ end
 -- 考虑如何计算行动意向。
 -- 由于可选行动会有很多，因此计算出的意向也不好直接摁死，采用为每种意向进行评分的机制。
 -- 行动意向评分表保存在mem中。
+--
+-- 上文说了意向评分受可用技能（卡牌算技能）和局势影响，那么至少技能需要提供自身的功能倾向
+-- 而局势判断可以先写死
 
 function SmartAI:initIntentionScore()
   if self.mem.intentionScore then return end
@@ -171,35 +181,47 @@ function SmartAI:handlePlayCard()
     end
   end
 
-  verbose(1, "======== %s: 开始计算出牌阶段 ========", tostring(self))
+  if self._debug then
+    verbose(1, "======== %s: 开始计算出牌阶段 ========", tostring(self))
+  end
 
   local cancel_val = math.min(90 * (self.player:getMaxCards() - self.player:getHandcardNum()), -1)
 
   local best_ret, best_val = "", cancel_val
-  verbose(1, "目前的决策：直接取消(收益%g)", best_val)
+  if self._debug then
+    verbose(1, "目前的决策：直接取消(收益%g)", best_val)
+  end
   for _, ai in fk.sorted_pairs(active_strategy_list, function(a) return a.use_priority end) do
     self:selectSkill(ai.skill_name, true)
 
     -- 干脆直接走handleActive的流程
 
     local ret, real_val = ai:makeReply(self) -- "", -10000 -- ai:think(self)
-    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), json.encode(real_val))
+    if self._debug then
+      verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), json.encode(real_val))
+    end
     real_val = real_val or -100000
 
     -- if ret and ret ~= "" then return ret end
     if best_val < real_val then
-      verbose(1, "将决策%s换成更好的%s (收益%g => %g)", json.encode(best_ret), json.encode(ret), best_val, real_val)
+      if self._debug then
+        verbose(1, "将决策%s换成更好的%s (收益%g => %g)", json.encode(best_ret), json.encode(ret), best_val, real_val)
+      end
       best_ret, best_val = ret, real_val
     end
     self:unSelectAll()
 
     -- FIXME: 为了实现按优先级出牌，干脆只要收益为正就出
     if best_val > 0 and best_val > cancel_val then
-      verbose(1, "懒得推测了，得出决策%s", json.encode(best_ret))
+      if self._debug then
+        verbose(1, "懒得推测了，得出决策%s", json.encode(best_ret))
+      end
       return best_ret
     end
   end
-  verbose(1, "推测出最佳决策是%s", json.encode(best_ret))
+  if self._debug then
+    verbose(1, "推测出最佳决策是%s", json.encode(best_ret))
+  end
   if best_ret and best_ret ~= "" then return best_ret end
   return ""
 end
@@ -215,9 +237,13 @@ function SmartAI:handleAskForCardChosen(data)
   local target = self.room:getPlayerById(target_id)
   local ai = self:findStrategyOfSkill(AI.CardChosenStrategy, reason)
   if ai then
-    verbose(1, "正在询问技能：%s, %s", ai.skill_name, prompt)
+    if self._debug then
+      verbose(1, "正在询问技能：%s, %s", ai.skill_name, prompt)
+    end
     local ret, real_val = ai:makeReply(self)
-    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
+    if self._debug then
+      verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
+    end
     return ret
   end
 end
@@ -226,9 +252,13 @@ function SmartAI:handleAskForSkillInvoke(data)
   local skillName, prompt = data[1], data[2]
   local ai = self:findStrategyOfSkill(AI.InvokeStrategy, skillName)
   if ai then
-    verbose(1, "正在询问技能：%s, %s", skillName, prompt)
+    if self._debug then
+      verbose(1, "正在询问技能：%s, %s", skillName, prompt)
+    end
     local ret = ai:makeReply(self)
-    verbose(1, "%s: 思考结果是%s", skillName, json.encode(ret))
+    if self._debug then
+      verbose(1, "%s: 思考结果是%s", skillName, json.encode(ret))
+    end
     return ret and "1" or ""
   else
     return ""
@@ -239,9 +269,13 @@ function SmartAI:handleAskForChoice(data)
   local choices, allChoices, skillName, prompt = table.unpack(data)
   local ai = self:findStrategyOfSkill(AI.ChoiceStrategy, skillName)
   if ai then
-    verbose(1, "正在询问技能：%s, 可选选项列表：%s", ai.skill_name, table.concat(choices, "+"))
+    if self._debug then
+      verbose(1, "正在询问技能：%s, 可选选项列表：%s", ai.skill_name, table.concat(choices, "+"))
+    end
     local ret, real_val = ai:makeReply(self)
-    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
+    if self._debug then
+      verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill_name, json.encode(ret), real_val)
+    end
     return ret or choices[1]
   else
     return choices[1]
@@ -300,8 +334,10 @@ function SmartAI:handleAskForUseCard(data)
       table.insertIfNeed(skill_ai_list, ai)
     end
   end
-  verbose(1, "======== %s: 开始计算出牌阶段 ========", tostring(self))
-  verbose(1, "待选技能：[%s]", table.concat(table.map(skill_ai_list, function(ai) return ai.skill.name end), ", "))
+  if self._debug then
+    verbose(1, "======== %s: 开始计算出牌阶段 ========", tostring(self))
+    verbose(1, "待选技能：[%s]", table.concat(table.map(skill_ai_list, function(ai) return ai.skill.name end), ", "))
+  end
 
   local value_func = function(ai)
     if not ai then return -500 end
@@ -311,19 +347,27 @@ function SmartAI:handleAskForUseCard(data)
 
   local best_ret, best_val = "", -100000
   for _, ai, val in fk.sorted_pairs(skill_ai_list, value_func) do
-    verbose(1, "[*] 考虑 %s (预估收益%g)", ai.skill.name, val)
+    if self._debug then
+      verbose(1, "[*] 考虑 %s (预估收益%g)", ai.skill.name, val)
+    end
     self:selectSkill(ai.skill.name, true)
     local ret, real_val = ai:think(self)
-    verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill.name, json.encode(ret), json.encode(real_val))
+    if self._debug then
+      verbose(1, "%s: 思考结果是%s, 收益是%s", ai.skill.name, json.encode(ret), json.encode(real_val))
+    end
     real_val = real_val or -100000
     -- if ret and ret ~= "" then return ret end
     if best_val < real_val then
-      verbose(1, "将决策%s换成更好的%s (收益%g => %g)", json.encode(best_ret), json.encode(ret), best_val, real_val)
+      if self._debug then
+        verbose(1, "将决策%s换成更好的%s (收益%g => %g)", json.encode(best_ret), json.encode(ret), best_val, real_val)
+      end
       best_ret, best_val = ret, real_val
     end
     self:unSelectAll()
   end
-  verbose(1, "推测出最佳决策是%s", json.encode(best_ret))
+  if self._debug then
+    verbose(1, "推测出最佳决策是%s", json.encode(best_ret))
+  end
   if best_ret and best_ret ~= "" then return best_ret end
   return ""
 end
@@ -377,10 +421,13 @@ function SmartAI:getKeepValue(card)
   return ret
 end
 
+-- 将卡牌id数组按照某种估值方针从小到大原地排序
 ---@param tab integer[]
 ---@param key "keep_value"|"use_value"|"use_priority"
----@param reverse boolean?
+---@param reverse boolean? 是否反过来排序（从大到小）
 function SmartAI:sortCards(tab, key, reverse)
+  -- value_tab是必须的，因为table.sort每轮比较时都会调用一次fun(a,b)
+  -- 太阳神卡慢的点之一就是没有提前计算出结果
   local value_tab = {}
   for _, id in ipairs(tab) do
     if key == "keep_value" then
@@ -391,9 +438,9 @@ function SmartAI:sortCards(tab, key, reverse)
   table.sort(tab, function(a, b)
     local va, vb = value_tab[a], value_tab[b]
     if reverse then
-      return a > b
+      return va > vb
     else
-      return a < b
+      return va < vb
     end
   end)
 end

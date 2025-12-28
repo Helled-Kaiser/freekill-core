@@ -38,8 +38,8 @@ end
 -- （至少是需要所有的以及觉得可行的可选情况，如果另外写AI的话）
 -- 但是也没办法一次性算出所有情况并拿去遍历。为此，只要每次调用都算出和之前不一样的解法就行了
 
-local function cardsAcceptable(smart_ai)
-  return smart_ai:okButtonEnabled() or (#smart_ai:getEnabledTargets() > 0)
+local function cardsAcceptable(ai)
+  return ai:okButtonEnabled() or (#ai:getEnabledTargets() > 0)
   -- return false
 end
 
@@ -63,39 +63,43 @@ end
 
 --- 针对一般技能的选卡搜索方案
 --- 注意选真牌时面板的合法性逻辑完全不同 对真牌就没必要如此遍历了
----@param smart_ai SmartAI
-function ActiveStrategy:searchCardSelections(smart_ai)
+---@param ai SmartAI
+function ActiveStrategy:searchCardSelections(ai)
   local searched = {}
   local function search()
-    local selected = smart_ai:getSelectedCards() -- 搜索起点
+    local selected = ai:getSelectedCards() -- 搜索起点
     local to_remove = selected[#selected]
     -- 空情况也考虑一下
-    verbose(1, "当前已选：%s", table.concat(selected, "|"))
-    if #selected == 0 and not searched[""] and cardsAcceptable(smart_ai) then
+    if ai._debug then
+      verbose(1, "当前已选：%s", table.concat(selected, "|"))
+    end
+    if #selected == 0 and not searched[""] and cardsAcceptable(ai) then
       searched[""] = true
       return {}
     end
-    verbose(1, "当前可选：%s", table.concat(smart_ai:getEnabledCards(), "|"))
+    if ai._debug then
+      verbose(1, "当前可选：%s", table.concat(ai:getEnabledCards(), "|"))
+    end
     -- 从所有可能的下一步找
-    for _, cid in ipairs(smart_ai:getEnabledCards()) do
+    for _, cid in ipairs(ai:getEnabledCards()) do
       table.insert(selected, cid)
       local str = cardsString(selected)
       if not searched[str] then
         searched[str] = true
-        smart_ai:selectCard(cid, true)
-        if cardsAcceptable(smart_ai) then
-          return smart_ai:getSelectedCards()
+        ai:selectCard(cid, true)
+        if cardsAcceptable(ai) then
+          return ai:getSelectedCards()
         end
         local ret = search()
         if ret then return ret end
-        smart_ai:selectCard(cid, false)
+        ai:selectCard(cid, false)
       end
       table.removeOne(selected, cid)
     end
 
     -- 返回上一步，考虑再次搜索
     if not to_remove then return nil end
-    smart_ai:selectCard(to_remove, false)
+    ai:selectCard(to_remove, false)
     return search()
   end
   return search
@@ -107,39 +111,43 @@ local function targetString(targets)
   return table.concat(ids, '+')
 end
 
----@param smart_ai SmartAI
-function ActiveStrategy:searchTargetSelections(smart_ai)
+---@param ai SmartAI
+function ActiveStrategy:searchTargetSelections(ai)
   local searched = {}
   local function search()
-    local selected = smart_ai:getSelectedTargets() -- 搜索起点
+    local selected = ai:getSelectedTargets() -- 搜索起点
     -- local to_remove = selected[#selected]
     -- 空情况也考虑一下
-    verbose(1, "当前已选：%s", table.concat(table.map(selected, Util.IdMapper), "|"))
-    if #selected == 0 and not searched[""] and smart_ai:okButtonEnabled() then
+    if ai._debug then
+      verbose(1, "当前已选：%s", table.concat(table.map(selected, Util.IdMapper), "|"))
+    end
+    if #selected == 0 and not searched[""] and ai:okButtonEnabled() then
       searched[""] = true
       return {}
     end
-    verbose(1, "当前可选：%s", table.concat(table.map(smart_ai:getEnabledTargets(), Util.IdMapper), "|"))
+    if ai._debug then
+      verbose(1, "当前可选：%s", table.concat(table.map(ai:getEnabledTargets(), Util.IdMapper), "|"))
+    end
     -- 从所有可能的下一步找
-    for _, target in ipairs(smart_ai:getEnabledTargets()) do
+    for _, target in ipairs(ai:getEnabledTargets()) do
       table.insert(selected, target)
       local str = targetString(selected)
       if not searched[str] then
         searched[str] = true
-        smart_ai:selectTarget(target, true)
-        if smart_ai:okButtonEnabled() then
-          return smart_ai:getSelectedTargets()
+        ai:selectTarget(target, true)
+        if ai:okButtonEnabled() then
+          return ai:getSelectedTargets()
         end
         local ret = search()
         if ret then return ret end
-        smart_ai:selectTarget(target, false)
+        ai:selectTarget(target, false)
       end
       table.removeOne(selected, target)
     end
 
     -- 返回上一步，考虑再次搜索
     if not to_remove then return nil end
-    smart_ai:selectTarget(to_remove, false)
+    ai:selectTarget(to_remove, false)
     return search()
   end
   return search
