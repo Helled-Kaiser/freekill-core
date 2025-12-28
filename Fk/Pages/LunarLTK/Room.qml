@@ -777,7 +777,7 @@ W.PageBase {
       if (data.type == "Interaction") {
         skillInteraction.sourceComponent = undefined;
         if (roomScene.popupBox.item)
-          roomScene.popupBox.item.close();
+          roomScene.popupBox.item.finished();
       }
     });
     uiUpdate["_new"]?.forEach(dat => {
