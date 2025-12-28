@@ -247,8 +247,6 @@ function CardSkill:withinTimesLimit(player, scope, card, card_name, to)
   (to and not not to:hasMark(MarkEnum.BypassTimesLimitTo))
 end
 
-
-
 ---@param room Room
 ---@param cardUseEvent UseCardData
 function CardSkill:onUse(room, cardUseEvent) end
@@ -270,8 +268,6 @@ function CardSkill:onEffect(room, cardEffectEvent) end
 ---@param room Room
 ---@param cardEffectEvent CardEffectData
 function CardSkill:onNullified(room, cardEffectEvent) end
-
-
 
 -- 卡牌生效前，询问抵消（默认杀询问闪，锦囊询问无懈）
 ---@param room Room

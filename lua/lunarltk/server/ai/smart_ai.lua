@@ -1,9 +1,10 @@
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
+---@class SmartAI.Memory : { [string]: any }
+---@field intentionScore table<SmartAI.Intention, number> 行动意向打分
+
 ---@class SmartAI: TrustAI, AIUtil
----@field private _memory table<string, any> @ AI底层的空间换时间机制
----@field public friends ServerPlayer[] @ 队友
----@field public enemies ServerPlayer[] @ 敌人
+---@field public mem SmartAI.Memory @ 暂存某些值避免重复计算
 local SmartAI = TrustAI:subclass("SmartAI")
 
 local AIUtil = require 'lunarltk.server.ai.util'
@@ -17,26 +18,8 @@ function SmartAI:initialize(player)
 end
 
 function SmartAI:makeReply()
-  self._memory = setmetatable({}, { __mode = "k" })
+  self.mem = setmetatable({}, { __mode = "k" })
   return TrustAI.makeReply(self)
-end
-
-function SmartAI:__index(k)
-  if self._memory[k] then
-    return self._memory[k]
-  end
-  local ret
-  if k == "enemies" then
-    ret = table.filter(self.room.alive_players, function(p)
-      return self:isEnemy(p)
-    end)
-  elseif k == "friends" then
-    ret = table.filter(self.room.alive_players, function(p)
-      return self:isFriend(p)
-    end)
-  end
-  self._memory[k] = ret
-  return ret
 end
 
 ---@generic T: AIStrategy
@@ -133,6 +116,33 @@ function SmartAI:handleAskForUseActiveSkill()
   local ret, real_val = ai:makeReply(self)
   verbose(1, "%s: 思考结果是%s, 收益是%s", _dbg_skill, json.encode(ret), json.encode(real_val))
   return ret, real_val
+end
+
+-- 出牌阶段AI的步骤是：
+-- 1. 分析手中的手牌、技能按钮以及局势，判断出本次行动意向，目前设计的意向有：
+--    进攻、防御、控制
+-- 2. (TODO) 为可以点击的卡牌转化技确定要转化的牌名 然后将该单一牌名纳入下一步那种牌名的考虑内
+-- 3. 将可用卡牌和技能按优先级排序，根据之前推测出的趋向，某些卡牌/技能的优先级会被修正
+-- 4. 计算优先级最高的3个卡牌/技能的方案及其收益
+--  * 如果都为负收益则顺延直到有3个正收益选项
+--  * 如果依然全部为负收益则与直接点击取消键的收益进行权衡
+-- 5. 返回收益最高者
+--
+-- 这个行动意向的设计是为了解决【杀】的收益必定大于【过河拆桥】导致ai喜欢先杀再拆的问题。
+--
+-- 推算的相关中间变量都保存在self.mem中，方便各种和ai相关的函数读取。
+-- self.mem在每次思考最开始时自动清空。单独开class方便编辑器补全
+--====================
+
+---@alias SmartAI.Intention "attack"|"defense"|"control"
+
+-- 考虑如何计算行动意向。
+-- 由于可选行动会有很多，因此计算出的意向也不好直接摁死，采用为每种意向进行评分的机制。
+-- 行动意向评分表保存在mem中。
+
+function SmartAI:initIntentionScore()
+  if self.mem.intentionScore then return end
+  self.mem.intentionScore = {}
 end
 
 function SmartAI:handlePlayCard()
