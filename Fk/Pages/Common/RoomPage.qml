@@ -469,7 +469,6 @@ Item {
         }
 
         Item {
-          visible: !Config.replaying
           AvatarChatBox {
             id: chat
             anchors.fill: parent
