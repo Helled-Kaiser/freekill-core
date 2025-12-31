@@ -401,8 +401,9 @@ function SmartAI:sortPlayers(tab, key, reverse)
 end
 
 ---@param card integer|Card
+---@param key "keep_value"|"use_value"|nil
 ---@return number
-function SmartAI:getKeepValue(card)
+function SmartAI:getCardValue(card, key)
   if type(card) == "number" then
     card = Fk:getCardById(card)
   end
@@ -431,7 +432,7 @@ function SmartAI:sortCards(tab, key, reverse)
   local value_tab = {}
   for _, id in ipairs(tab) do
     if key == "keep_value" then
-      value_tab[id] = self:getKeepValue(id)
+      value_tab[id] = self:getCardValue(id)
     end
   end
 
@@ -471,14 +472,23 @@ end
 ---@return integer[], integer @ 返回本次选牌收益最大的一种情况，选择的卡牌和收益
 function SmartAI:askToChooseCards(params)
   local skill_name, data = params.skill_name, params.data
-  local ret, benefit = { -1 }, -100000
-  for _, id in ipairs(params.cards) do
-    local v = self:getBenefitOfEvents(function(logic)
-      logic:moveCardTo(id, data.to_place, data.target, data.reason, skill_name, nil, false, data.proposer)
-    end)
-    if v > benefit then
-      ret, benefit = { id }, v
+  data.min = data.min or 1
+  data.max = data.max or data.min
+  local cards = table.simpleClone(params.cards)
+  local ret, benefit = { }, -100000
+  for _ = data.max, 1, -1 do
+    local tmp_id, tmp_benefit = -1, -100000
+    for _, id in ipairs(cards) do
+      local v = self:getBenefitOfEvents(function(logic)
+        logic:moveCardTo(id, data.to_place, data.target, data.reason, skill_name, nil, false, data.proposer)
+      end)
+      if v > tmp_benefit then
+        tmp_id, tmp_benefit = id, v
+      end
     end
+    table.insertIfNeed(ret, tmp_id)
+    benefit = benefit + tmp_benefit
+    table.removeOne(cards, tmp_id)
   end
   return ret, benefit
 end

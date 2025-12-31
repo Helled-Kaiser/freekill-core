@@ -84,4 +84,17 @@ skill:addTest(function(room, me)
 end)
 --]]
 
+skill:addAI(Fk.Ltk.AI.newInvokeStrategy{
+  think = function(self, ai)
+    return ai:getBenefitOfEvents(function(logic)
+      logic:judge({
+        who = ai.player,
+        reason = skill.name,
+        pattern = ".|.|red",
+      })
+    end) >= 0
+  end,
+})
+
+
 return skill
