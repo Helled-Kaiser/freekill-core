@@ -4,7 +4,7 @@ local skill = fk.CreateSkill {
 }
 
 ---@type AskForCardFunc
-local eight_diagram_on_use = function (self, event, target, player, data)
+local spec = function (self, event, target, player, data)
     local room = player.room
     local judgeData = {
       who = player,
@@ -34,7 +34,7 @@ skill:addEffect(fk.AskForCardUse, {
       Exppattern:Parse(data.pattern):matchExp("jink|0|nosuit|none") and
       not player:prohibitUse(Fk:cloneCard("jink"))
   end,
-  on_use = eight_diagram_on_use,
+  on_use = spec,
 })
 skill:addEffect(fk.AskForCardResponse, {
   can_trigger = function(self, event, target, player, data)
@@ -42,7 +42,7 @@ skill:addEffect(fk.AskForCardResponse, {
       Exppattern:Parse(data.pattern):matchExp("jink|0|nosuit|none") and
       not player:prohibitResponse(Fk:cloneCard("jink"))
   end,
-  on_use = eight_diagram_on_use,
+  on_use = spec,
 })
 
 ---[[
