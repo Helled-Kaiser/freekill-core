@@ -150,22 +150,16 @@ function SkillSkeleton:addEffect(key, data, attribute)
   return self
 end
 
---[[
----@param spec? SkillAISpec|TriggerSkillAISpec
----@param inherit? string
----@param key? string
----@param setTriggerSkillAI? boolean
----@return SkillSkeleton
-function SkillSkeleton:addAI(spec, inherit, key, setTriggerSkillAI)
-  table.insert(self.ai_list, { key or self.name, spec, inherit, setTriggerSkillAI })
-  return self
-end
---]]
-
----@param strategy AIStrategy
+---@param strategy AIStrategy|AIReuseSpec
 function SkillSkeleton:addAI(strategy)
   if type(strategy) ~= "table" then return self end
-  local klass = strategy.class
+  local klass
+  if strategy._reuse then
+    klass = strategy._reuse_type
+  else
+    klass = strategy.class
+  end
+
   if not klass then return self end
 
   self.ai_strategies[klass] = self.ai_strategies[klass] or {}
