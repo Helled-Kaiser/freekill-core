@@ -22,7 +22,7 @@ function AI:initialize(player)
   -- 总之开发底层ai时设为true就可以了
   --
   -- [!!] 提交到master的话这个务必设为false!
-  self._debug = true
+  self._debug = false
 end
 
 function AI:__tostring()
