@@ -190,53 +190,23 @@ function UseCardData:changeCard(name, suit, number, skill_name)
 end
 
 --- 判断使用事件是否是在使用手牌
----@param player ServerPlayer @ 要判断的使用者
----@param realUseEvent? GameEvent.UseCard @ 指定使用事件，用于记录器判断
+---@param player? ServerPlayer @ 要判断的使用者
 ---@return boolean
-function UseCardData:isUsingHandcard(player, realUseEvent)
-  local useEvent = realUseEvent or player.room.logic:getCurrentEvent()
-  local cards = Card:getIdList(self.card)
-  if #cards == 0 then return false end
-  local moveEvents = useEvent:searchEvents(GameEvent.MoveCards, 1, function(e)
-    return e.parent and e.parent.id == useEvent.id
+function UseCardData:isUsingHandcard(player)
+  player = player or self.from
+  local infos = self.subCardFromInfo
+  return infos ~= nil and #infos > 0 and table.every(infos, function(info)
+    return info.from == player and info.fromArea == Card.PlayerHand
   end)
-  if #moveEvents == 0 then return false end
-  local subcheck = table.simpleClone(cards)
-  for _, move in ipairs(moveEvents[1].data) do
-    if move.moveReason == fk.ReasonUse then
-      for _, info in ipairs(move.moveInfo) do
-        if table.removeOne(subcheck, info.cardId) and info.fromArea ~= Card.PlayerHand then
-          return false
-        end
-      end
-    end
-  end
-  return #subcheck == 0
 end
 
 --- 判断打出事件是否是在打出手牌
----@param player ServerPlayer @ 要判断的使用者
----@param realRespondEvent? GameEvent.RespondCard @ 指定使用事件，用于记录器判断
+---@param player? ServerPlayer @ 要判断的使用者
 ---@return boolean
-function RespondCardData:isUsingHandcard(player, realRespondEvent)
-  local useEvent = realRespondEvent or player.room.logic:getCurrentEvent()
-  local cards = Card:getIdList(self.card)
-  if #cards == 0 then return false end
-  local moveEvents = useEvent:searchEvents(GameEvent.MoveCards, 1, function(e)
-    return e.parent and e.parent.id == useEvent.id
-  end)
-  if #moveEvents == 0 then return false end
-  local subcheck = table.simpleClone(cards)
-  for _, move in ipairs(moveEvents[1].data) do
-    if move.moveReason == fk.ReasonResponse then
-      for _, info in ipairs(move.moveInfo) do
-        if table.removeOne(subcheck, info.cardId) and info.fromArea ~= Card.PlayerHand then
-          return false
-        end
-      end
-    end
-  end
-  return #subcheck == 0
+function RespondCardData:isUsingHandcard(player)
+  -- 复用 UseCardData 的逻辑，通过类型注解规避警告
+  ---@diagnostic disable-next-line
+  return UseCardData.isUsingHandcard(self, player)
 end
 
 --- 判断一名角色是否是该使用事件的唯一目标
