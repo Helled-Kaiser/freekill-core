@@ -295,13 +295,24 @@ local function moveInfoTranslate(room, ...)
 
       -- 若移动到被废除的装备栏，则修改为置入弃牌堆
       local toAbortDrop = false
-      if cardsMoveInfo.toArea == Card.PlayerEquip and cardsMoveInfo.to then
-        local moveToPlayer = cardsMoveInfo.to
-        ---@cast moveToPlayer -nil 防止判空波浪线
+      local to = cardsMoveInfo.to
+      if to then
         local card = cardsMoveInfo.virtualEquip or Fk:getCardById(id)
-        if card.type == Card.TypeEquip and #moveToPlayer:getAvailableEquipSlots(card.sub_type) == 0 then
-          table.insert(abortMoveInfos, info)
-          toAbortDrop = true
+        if cardsMoveInfo.toArea == Card.PlayerEquip then
+          if card.type == Card.TypeEquip and #to:getAvailableEquipSlots(card.sub_type) == 0 then
+            table.insert(abortMoveInfos, info)
+            toAbortDrop = true
+          end
+        elseif cardsMoveInfo.toArea == Card.PlayerJudge then
+          if to:isJudgeAreaSealed() then
+            table.insert(abortMoveInfos, info)
+            toAbortDrop = true
+          end
+        elseif cardsMoveInfo.toArea == Card.PlayerHand then
+          if to:isHandAreaSealed() then
+            table.insert(abortMoveInfos, info)
+            toAbortDrop = true
+          end
         end
       end
 

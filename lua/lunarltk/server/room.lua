@@ -3337,11 +3337,20 @@ function Room:abortPlayerArea(player, playerSlots)
   for _, slot in ipairs(playerSlots) do
     if slot == Player.JudgeSlot then
       if not table.contains(player.sealedSlots, Player.JudgeSlot) then
-        table.insertIfNeed(slotsToSeal, Player.JudgeSlot)
+        table.insert(slotsToSeal, Player.JudgeSlot)
 
         local delayedTricks = player:getCardIds(Player.Judge)
         if #delayedTricks > 0 then
           table.insertTable(cardsToDrop, delayedTricks)
+        end
+      end
+    elseif slot == Player.HandSlot then
+      if not table.contains(player.sealedSlots, Player.HandSlot) then
+        table.insert(slotsToSeal, Player.HandSlot)
+
+        local cids = player:getCardIds(Player.Hand)
+        if #cids > 0 then
+          table.insertTable(cardsToDrop, cids)
         end
       end
     else
@@ -3381,6 +3390,7 @@ function Room:abortPlayerArea(player, playerSlots)
       arg = s,
     }
   end
+
   self.logic:trigger(fk.AreaAborted, player, { slots = slotsToSeal })
 end
 
@@ -3396,7 +3406,7 @@ function Room:resumePlayerArea(player, playerSlots)
 
   local slotsToResume = {}
   for _, slot in ipairs(playerSlots) do
-    for i = 1, #player.sealedSlots do
+    for i = #player.sealedSlots, 1, -1 do
       if player.sealedSlots[i] == slot then
         table.remove(player.sealedSlots, i)
         table.insert(slotsToResume, slot)

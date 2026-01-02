@@ -613,6 +613,7 @@ Fk:loadTranslationTable {
   ["OffensiveRideSlot"] = "进攻坐骑栏",
   ["DefensiveRideSlot"] = "防御坐骑栏",
   ["TreasureSlot"] = "宝物栏",
+  ["HandSlot"] = "手牌区",
   ["JudgeSlot"] = "判定区",
 
   ["skill"] = "技能",
