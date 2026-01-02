@@ -150,7 +150,7 @@ local markBeforeCardInfo = function(room, useCardData)
     info.fromSpecialName = owner and owner:getPileNameOfId(id)
     table.insert(infos, info)
   end
-  useCardData.subCardFromInfo = infos
+  useCardData.subcardsFromInfo = infos
 end
 
 ---@class GameEvent.UseCard : GameEvent
