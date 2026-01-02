@@ -46,8 +46,6 @@ cheat:addEffect("active", {
       toGain = table.random(allCardMapper[cardName])
     end
     room:obtainCard(effect.from, toGain, true, fk.ReasonPrey, effect.from, "cheat")
-
-    room:abortPlayerArea(effect.from, Player.HandSlot)
   end
 })
 
