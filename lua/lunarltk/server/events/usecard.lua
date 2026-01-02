@@ -124,6 +124,35 @@ local sendCardEmotionAndLog = function(room, useCardData, muteEmotion)
   end
 end
 
+-- 填充使用/打出前此牌在原区域内的卡牌信息
+---@param room Room
+---@param useCardData UseCardData|RespondCardData
+local markBeforeCardInfo = function(room, useCardData)
+  local infos = {}
+  for _, id in ipairs(Card:getIdList(useCardData.card)) do
+    local info = {}
+    local card = Fk:getCardById(id)
+    local owner = room:getCardOwner(id)
+    if owner then
+      card = owner:getVirtualEquip(id) or card
+    end
+    local c = Fk:cloneCard(card.name, card.suit, card.number)
+    local markTable = card:isVirtual() and card.mark or room.card_marks[card.id]
+    if markTable then
+      for k, v in pairs(markTable) do
+        c.mark[k] = v
+      end
+    end
+
+    info.card = c
+    info.from = owner
+    info.fromArea = room:getCardArea(id)
+    info.fromSpecialName = owner and owner:getPileNameOfId(id)
+    table.insert(infos, info)
+  end
+  useCardData.subCardFromInfo = infos
+end
+
 ---@class GameEvent.UseCard : GameEvent
 ---@field public data UseCardData
 local UseCard = GameEvent:subclass("GameEvent.UseCard")
@@ -191,6 +220,8 @@ function UseCard:main()
   end
 
   sendCardEmotionAndLog(room, useCardData, (useCardData.attachedSkillAndUser or {}).muteCard)
+
+  markBeforeCardInfo(room, useCardData)
 
   room:moveCardTo(useCardData.card, Card.Processing, nil, fk.ReasonUse)
 
@@ -310,6 +341,8 @@ function RespondCard:main()
     from = from.id,
     card = { card },
   }
+
+  markBeforeCardInfo(room, respondCardData)
 
   room:moveCardTo(card, Card.Processing, nil, fk.ReasonResponse)
   local footnote = {

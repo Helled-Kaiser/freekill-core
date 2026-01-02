@@ -3,6 +3,7 @@
 ---@class RespondCardDataSpec
 ---@field public from ServerPlayer @ 使用/打出者
 ---@field public card Card @ 卡牌本牌
+---@field public subCardFromInfo? { card: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
 ---@field public responseToEvent? CardEffectData @ 响应事件目标
 ---@field public skipDrop? boolean @ 是否不进入弃牌堆
 ---@field public customFrom? ServerPlayer @ 新响应者
@@ -27,6 +28,7 @@ fk.CardRespondFinished = RespondCardEvent:subclass("fk.CardRespondFinished")
 ---@class UseCardDataSpec
 ---@field public from ServerPlayer @ 使用/打出者
 ---@field public card Card @ 卡牌本牌
+---@field public subCardFromInfo? { card: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
 ---@field public tos ServerPlayer[] @ 目标列表
 ---@field public subTos? ServerPlayer[][] @ 子目标列表，借刀最爱的一集
 ---@field public toCard? Card @ 卡牌目标
