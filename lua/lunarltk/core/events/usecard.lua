@@ -43,6 +43,7 @@ fk.CardRespondFinished = RespondCardEvent:subclass("fk.CardRespondFinished")
 ---@field public prohibitedCardNames? string[] @ 这些牌名的牌不可响应此牌
 ---@field public damageDealt? table<ServerPlayer, number> @ 此牌造成的伤害
 ---@field public additionalEffect? integer @ 额外结算次数
+---@field public additionalEffectToPlayer? table<ServerPlayer, integer> @ 对某人的额外生效次数
 ---@field public noIndicate? boolean @ 隐藏指示线
 ---@field public attachedSkillAndUser? { user: integer, skillName: string, muteCard: boolean } @ 附加技能、使用者与卡牌静音，用于转化技
 
@@ -246,6 +247,17 @@ function UseCardData:isOnlyTarget(target)
   return table.contains(tos, target) and not table.find(target.room.alive_players, function (p)
     return p ~= target and table.contains(tos, p)
   end)
+end
+
+--- 让此卡对player多生效n次，可以在生效途中修改
+---
+--- n可以是负数，此时为少生效相应次（注意无效是另外一个字段）
+---@param player ServerPlayer
+---@param n integer
+function UseCardData:changeEffectTimes(player, n)
+  self.additionalEffectToPlayer = self.additionalEffectToPlayer or {}
+  self.additionalEffectToPlayer[player] = self.additionalEffectToPlayer[player] or 0
+  self.additionalEffectToPlayer[player] = self.additionalEffectToPlayer[player] + n
 end
 
 ---@class UseCardEvent: TriggerEvent

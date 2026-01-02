@@ -699,11 +699,12 @@ function UseCardEventWrappers:doCardUseEffect(useCardData)
   -- 每次结算中，先调用onAction（开幕），再对每个目标生效，再调用onAction（结束）
   useCardData.additionalEffect = useCardData.additionalEffect or 0
   while true do
+    -- onAction：开始时（为什么不设计成两个方法呢）
     if #useCardData.tos > 0 and useCardData.card.skill.onAction then
       useCardData.card.skill:onAction(self, useCardData)
     end
 
-    -- Else: do effect to all targets
+    -- 对所有目标按顺序各进行生效
     local collaboratorsIndex = {}
     for _, to in ipairs(useCardData.tos) do
       if to:isAlive() then
@@ -742,20 +743,31 @@ function UseCardEventWrappers:doCardUseEffect(useCardData)
 
           collaboratorsIndex[to] = collaboratorsIndex[to] + 1
 
-          local curCardEffectEvent = CardEffectData:new(table.simpleClone(cardEffectData))
-          self:doCardEffect(curCardEffectEvent)
+          while to:isAlive() do
+            local curCardEffectEvent = CardEffectData:new(table.simpleClone(cardEffectData))
+            self:doCardEffect(curCardEffectEvent)
 
-          if curCardEffectEvent.cardsResponded then
-            useCardData.cardsResponded = useCardData.cardsResponded or {}
-            for _, card in ipairs(curCardEffectEvent.cardsResponded) do
-              table.insertIfNeed(useCardData.cardsResponded, card)
+            if curCardEffectEvent.cardsResponded then
+              useCardData.cardsResponded = useCardData.cardsResponded or {}
+              for _, card in ipairs(curCardEffectEvent.cardsResponded) do
+                table.insertIfNeed(useCardData.cardsResponded, card)
+              end
+            end
+
+            local effectTimeTab = useCardData.additionalEffectToPlayer
+            if not effectTimeTab then break end
+            if not effectTimeTab[to] then break end
+            if effectTimeTab[to] > 0 then
+              effectTimeTab[to] = effectTimeTab[to] - 1
+            else
+              break
             end
           end
-
         end
       end
     end
 
+    -- onAction：结束时（为什么不设计成两个方法呢）
     if #useCardData.tos > 0 and useCardData.card.skill.onAction then
       useCardData.card.skill:onAction(self, useCardData, true)
     end
