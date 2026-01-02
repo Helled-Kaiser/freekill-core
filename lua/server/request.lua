@@ -133,7 +133,7 @@ function Request:_checkReply(player, use_ai)
       local p, command, fn = br[1], br[2], br[3]
       if p == player and command == self.command and fn(self.data[player.id]) then
         table.remove(breakpoints, i)
-        coroutine.yield("__handleRequest")
+        room:yield()
         break
       end
     end
@@ -294,7 +294,7 @@ function Request:ask()
       if room._test_disable_delay then
         resume_reason = "request_timer"
       else
-        resume_reason = coroutine.yield("__handleRequest")
+        resume_reason = room:yield()
       end
     end
   end
