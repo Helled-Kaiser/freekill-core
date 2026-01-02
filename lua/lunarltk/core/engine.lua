@@ -622,7 +622,11 @@ function Engine:filterCard(id, player)
       local new_card = f:viewAs(player, card)
       if new_card then
         new_card.id = id
-        new_card.skillName = f.name
+
+        local skel = f:getSkeleton() -- 获得骨架名
+        local skill_name = skel and skel.name or f.name
+
+        new_card.skillName = skill_name
         card = new_card
         self.filtered_cards[id] = card
         modity = true
