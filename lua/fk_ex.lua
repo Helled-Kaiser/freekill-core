@@ -224,6 +224,7 @@ end
 ---@field public skill? ActiveSkill
 ---@field public special_skills? string[]
 ---@field public is_damage_card? boolean @ 是否为伤害类卡牌
+---@field public damage_type? integer @ 牌造成伤害的属性
 ---@field public multiple_targets? boolean @ 是否为多目标卡牌
 ---@field public stackable_delayed? boolean @ 是否为可堆叠的延时锦囊牌
 ---@field public is_passive? boolean @ 是否为被动使用的卡牌，如闪、无懈
@@ -246,6 +247,7 @@ function fk.readCardSpecToCard(card, spec)
   card.skill.cardSkill = true
   card.special_skills = spec.special_skills
   card.is_damage_card = spec.is_damage_card
+  card.damage_type = spec.damage_type
   card.multiple_targets = spec.multiple_targets
   card.stackable_delayed = spec.stackable_delayed
   card.is_passive = spec.is_passive
