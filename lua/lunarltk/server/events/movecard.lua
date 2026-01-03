@@ -745,7 +745,7 @@ function MoveEventWrappers:returnCardsToDrawPile(player, cards, skillName, toPla
     proposer = player,
     moveVisible = (moveVisible == nil or moveVisible == true),
     visiblePlayers = visiblePlayers or (moveVisible == false and { player } or nil),
-    drawPilePosition = toPlace == "top" and 1 or -1
+    drawPilePosition = toPlace == "bottom" and -1 or nil
   }
 end
 
