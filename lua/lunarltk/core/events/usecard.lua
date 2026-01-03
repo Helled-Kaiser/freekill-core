@@ -209,6 +209,80 @@ function RespondCardData:isUsingHandcard(player)
   return UseCardData.isUsingHandcard(self, player)
 end
 
+--- 获取使用事件的实体牌带有的标记
+---@param name string @ 标记名称（要检查的卡牌标记字符串）
+---@return table
+function UseCardData:getMark(name)
+  local marks = {}
+  local infos = self.subcardsFromInfo
+  if infos then
+    for i = 1, #infos do
+      local mark = infos[i].card:getMark(name)
+      if mark ~= 0 then
+        table.insert(marks, mark)
+      end
+    end
+  end
+  return marks
+end
+
+--- 获取打出事件的实体牌带有的标记
+---@param name string @ 标记名称（要检查的卡牌标记字符串）
+---@return table
+function RespondCardData:getMark(name)
+  -- 复用 UseCardData 的逻辑，通过类型注解规避警告
+  ---@diagnostic disable-next-line
+  return UseCardData.getMark(self, name)
+end
+
+--- 判断使用事件是否是在使用带标记的牌
+---@param name string @ 标记名称（要检查的卡牌标记字符串）
+---@param findOne? boolean @ 查找逻辑开关：true=只要有任意一张卡牌带该标记就返回true；false=要求所有卡牌都带该标记才返回true，否则返回false
+---@return boolean
+function UseCardData:hasMark(name, findOne)
+  -- 缓存子卡牌列表（仅保留必要的非空判断）
+  local infos = self.subcardsFromInfo
+  if not infos or #infos == 0 then
+    return false
+  end
+
+  -- 拆分逻辑，删除循环内的空值校验
+  if findOne then
+    -- 找任意一个符合条件的卡牌，找到即返回
+    for i = 1, #infos do
+      local info = infos[i]
+      -- 直接判断标记，取消 info/card 的空值校验
+      if info.card:getMark(name) > 0 then
+        return true
+      end
+    end
+  else
+    -- 要求所有卡牌都符合条件，找到一个不符合就返回
+    for i = 1, #infos do
+      local info = infos[i]
+      -- 直接判断标记，取消 info/card 的空值校验
+      if info.card:getMark(name) <= 0 then
+        return false
+      end
+    end
+    -- 所有卡牌都符合条件，返回true
+    return true
+  end
+
+  -- 遍历结束未找到符合条件的，返回false
+  return false
+end
+
+--- 判断打出事件是否是在使用带标记的牌
+---@param name string @ 标记名称（要检查的卡牌标记字符串）
+---@param findOne? boolean @ 查找逻辑开关：true=只要有任意一张卡牌带该标记就返回true；false=要求所有卡牌都带该标记才返回true，否则返回false
+---@return boolean
+function RespondCardData:hasMark(name, findOne)
+  -- 复用 UseCardData 的逻辑，通过类型注解规避警告
+  ---@diagnostic disable-next-line
+  return UseCardData.hasMark(self, name, findOne)
+end
+
 --- 判断一名角色是否是该使用事件的唯一目标
 --- 其实这个应该是AimData的，但普通的使用牌有时也得用
 ---@param target ServerPlayer
