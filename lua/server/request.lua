@@ -237,20 +237,21 @@ function Request:ask()
     local elapsed = os.time() - currentTime
     if self.timeout - elapsed <= 0 or resume_reason == "request_timer" then
       for i = #players, 1, -1 do
-        table.insert(self.overtimes, players[i])
-        if players[i].serverplayer:getState() == fk.Player_Online then
-          players[i].serverplayer:setState(fk.Player_Trust)
-        end
-        if self.send_success[players[i].serverplayer] then
+        local player = players[i]
+        if self.send_success[player.serverplayer] then
           table.remove(players, i)
+        elseif self.timeout - elapsed <= 0 then
+          table.insert(self.overtimes, player)
+          if player.serverplayer:getState() == fk.Player_Online then
+            player.serverplayer:setState(fk.Player_Trust)
+          end
         end
       end
     end
 
     -- 若players中只剩人机，那么允许人机进行计算
     if table.every(players, function(p)
-      return p.serverplayer:getState() ~= fk.Player_Online or not
-        self.send_success[p.serverplayer]
+      return p.serverplayer:getState() ~= fk.Player_Online or not self.send_success[p.serverplayer]
     end) then
       self.ai_start_time = os.getms()
     end
