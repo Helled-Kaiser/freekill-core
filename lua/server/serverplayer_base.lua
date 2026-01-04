@@ -3,7 +3,7 @@
 ---@field public serverplayer fk.ServerPlayer @ 控制者对应的C++玩家
 ---@field public _splayer fk.ServerPlayer @ 对应的C++玩家
 ---@field public room ServerRoomBase
----@field public _timewaste_count integer
+---@field public _timewaste_count integer @连续烧绳时间，单位为秒
 ---@field public ai Base.AI
 local ServerPlayerBase = {}
 

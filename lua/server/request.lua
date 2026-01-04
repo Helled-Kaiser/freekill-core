@@ -19,7 +19,6 @@
 ---@field private _asked boolean? @ 是否询问过了
 ---@field public focus_players? ServerPlayer[] @ 要moveFocus的玩家们 默认参与者
 ---@field public focus_text? string @ 要moveFocus的文字 默认self.command
----@field public no_time_waste_check? boolean
 local Request = class("Request")
 
 -- TODO: 懒得思考了
@@ -238,13 +237,17 @@ function Request:ask()
     if self.timeout - elapsed <= 0 or resume_reason == "request_timer" then
       for i = #players, 1, -1 do
         local player = players[i]
-        if self.send_success[player.serverplayer] then
-          table.remove(players, i)
-        elseif self.timeout - elapsed <= 0 then
+        if self.timeout - elapsed <= 0 then
           table.insert(self.overtimes, player)
-          if player.serverplayer:getState() == fk.Player_Online then
+          player._timewaste_count = player._timewaste_count + elapsed
+          if player._timewaste_count >= 60 and
+            player.serverplayer:getState() == fk.Player_Online then
+            player._timewaste_count = 0
             player.serverplayer:setState(fk.Player_Trust)
           end
+        end
+        if self.send_success[player.serverplayer] then
+          table.remove(players, i)
         end
       end
     end
@@ -270,6 +273,7 @@ function Request:ask()
         changed = true
 
         if reply ~= "__cancel" or self.accept_cancel then
+          player._timewaste_count = 0
           table.insert(self.winners, player)
           if #self.winners >= self.n then
             -- winner数量已经足够，剩下的人不用算了
@@ -349,15 +353,6 @@ function Request:_finish()
     end
     if self.result[p.id] == nil then
       self.result[p.id] = self.default_reply[p.id] or ""
-      if not self.no_time_waste_check then
-        p._timewaste_count = p._timewaste_count + 1
-        if p._timewaste_count >= 3 and p.serverplayer:getState() == fk.Player_Online then
-          p._timewaste_count = 0
-          p.serverplayer:emitKick()
-        end
-      end
-    else
-      p._timewaste_count = 0
     end
     if self.result[p.id] == "__cancel" then
       self.result[p.id] = (not self.accept_cancel) and self.default_reply[p.id] or ""
