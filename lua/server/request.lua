@@ -238,6 +238,9 @@ function Request:ask()
     if self.timeout - elapsed <= 0 or resume_reason == "request_timer" then
       for i = #players, 1, -1 do
         table.insert(self.overtimes, players[i])
+        if players[i].serverplayer:getState() == fk.Player_Online then
+          players[i].serverplayer:setState(fk.Player_Trust)
+        end
         if self.send_success[players[i].serverplayer] then
           table.remove(players, i)
         end
