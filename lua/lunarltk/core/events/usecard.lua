@@ -252,7 +252,7 @@ function UseCardData:hasMark(name, findOne)
     for i = 1, #infos do
       local info = infos[i]
       -- 直接判断标记，取消 info/card 的空值校验
-      if info.card:getMark(name) > 0 then
+      if info.beforeCard:getMark(name) > 0 then
         return true
       end
     end
@@ -261,7 +261,7 @@ function UseCardData:hasMark(name, findOne)
     for i = 1, #infos do
       local info = infos[i]
       -- 直接判断标记，取消 info/card 的空值校验
-      if info.card:getMark(name) <= 0 then
+      if info.beforeCard:getMark(name) <= 0 then
         return false
       end
     end
