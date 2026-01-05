@@ -3,7 +3,7 @@
 ---@class RespondCardDataSpec
 ---@field public from ServerPlayer @ 使用/打出者
 ---@field public card Card @ 卡牌本牌
----@field public subcardsFromInfo? { card: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
+---@field public subcardsFromInfo? { cardId: integer, beforeCard: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
 ---@field public responseToEvent? CardEffectData @ 响应事件目标
 ---@field public skipDrop? boolean @ 是否不进入弃牌堆
 ---@field public customFrom? ServerPlayer @ 新响应者
@@ -28,7 +28,7 @@ fk.CardRespondFinished = RespondCardEvent:subclass("fk.CardRespondFinished")
 ---@class UseCardDataSpec
 ---@field public from ServerPlayer @ 使用/打出者
 ---@field public card Card @ 卡牌本牌
----@field public subcardsFromInfo? { card: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
+---@field public subcardsFromInfo? { cardId: integer, beforeCard: Card, from?: ServerPlayer, fromArea: CardArea, fromSpecialName?: string }[] @ 实体牌来源
 ---@field public tos ServerPlayer[] @ 目标列表
 ---@field public subTos? ServerPlayer[][] @ 子目标列表，借刀最爱的一集
 ---@field public toCard? Card @ 卡牌目标
@@ -217,7 +217,7 @@ function UseCardData:getMark(name)
   local infos = self.subcardsFromInfo
   if infos then
     for i = 1, #infos do
-      local mark = infos[i].card:getMark(name)
+      local mark = infos[i].beforeCard:getMark(name)
       if mark ~= 0 then
         table.insert(marks, mark)
       end

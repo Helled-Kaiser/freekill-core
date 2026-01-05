@@ -137,7 +137,7 @@ local markBeforeCardInfo = function(room, useCardData)
       card = owner:getVirtualEquip(id) or card
     end
     local c = Fk:cloneCard(card.name, card.suit, card.number)
-    c.id = card.id
+    --c.id = card.id
     c.skillNames = card.skillNames
     local markTable = card:isVirtual() and card.mark or room.card_marks[card.id]
     if markTable then
@@ -146,7 +146,8 @@ local markBeforeCardInfo = function(room, useCardData)
       end
     end
 
-    info.card = c
+    info.cardId = id
+    info.beforeCard = c
     info.from = owner
     info.fromArea = room:getCardArea(id)
     info.fromSpecialName = owner and owner:getPileNameOfId(id)
