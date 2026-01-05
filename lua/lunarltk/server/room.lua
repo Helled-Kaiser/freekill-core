@@ -698,7 +698,7 @@ function Room:askToUseActiveSkill(player, params)
     from = player,
     cards = selected_cards,
     tos = table.map(targets, Util.Id2PlayerMapper),
-    interaction = interaction
+    interaction_data = interaction
   }
   local use_data = skill:handleCostData(player, use_spec, params.extra_data)
 
@@ -709,7 +709,7 @@ function Room:askToUseActiveSkill(player, params)
   return true, {
     cards = use_data.cards,
     targets = use_data.tos,
-    interaction = interaction
+    interaction = use_data.interaction_data
   }
 end
 
