@@ -178,12 +178,12 @@ end
 ---@field public prohibit_pindian? fun(self: ProhibitSkill, from: Player, to: Player): any
 
 ---@class AttackRangeSpec: StatusSkillSpec
----@field public correct_func? fun(self: AttackRangeSkill, from: Player, to: Player): number?
+---@field public correct_func? fun(self: AttackRangeSkill, from: Player, to: Player): number? @ 增加的攻击范围
 ---@field public fixed_func? fun(self: AttackRangeSkill, player: Player): number?  @ 判定角色的锁定攻击范围初值
 ---@field public final_func? fun(self: AttackRangeSkill, player: Player): number?  @ 判定角色的锁定攻击范围终值
 ---@field public within_func? fun(self: AttackRangeSkill, from: Player, to: Player): any @ 判定to角色是否锁定在角色from攻击范围内
 ---@field public without_func? fun(self: AttackRangeSkill, from: Player, to: Player): any @ 判定to角色是否锁定在角色from攻击范围外
----@field public virtual_weapon_func? fun(self: AttackRangeSkill, player: Player): any @ 虚拟武器攻击范围
+---@field public virtual_weapon_func? fun(self: AttackRangeSkill, player: Player): number? @ 虚拟武器攻击范围
 
 ---@class MaxCardsSpec: StatusSkillSpec
 ---@field public correct_func? fun(self: MaxCardsSkill, player: Player): number?

@@ -152,7 +152,6 @@ function MoveCards:main()
           if type(mark) == "string" then
             room:setCardMark(currentCard, mark, 1)
           elseif type(mark) == "table" then
-            mark = table.clone(mark)
             for i = 1, #mark // 2 do
               room:setCardMark(currentCard, mark[2 * i - 1], mark[2 * i])
             end
