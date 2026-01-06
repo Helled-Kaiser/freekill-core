@@ -303,12 +303,14 @@ end
 ---@param player ServerPlayer
 ---@param num integer
 ---@param skillName string
+---@param proposer? ServerPlayer
 ---@return boolean
-function AIGameLogic:loseHp(player, num, skillName)
+function AIGameLogic:loseHp(player, num, skillName, proposer)
   local data = HpLostData:new{
     who = player,
     num = num,
     skillName = skillName,
+    proposer = proposer or player,
   }
   return not LoseHp:new(self, data):getBenefit()
 end
