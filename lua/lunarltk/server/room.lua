@@ -3112,21 +3112,20 @@ end
 function Room:arrangeTurn(players)
   if self.current == nil then return end
   local round_event = self.logic:getCurrentEvent():findParent(GameEvent.Round, true)
-  if round_event then
-    local turn_table = round_event.data.turn_table
-    if turn_table then
-      local new_turn_table = {}
-      if players then
-        new_turn_table = table.simpleClone(players)
-      else
-        local current = round_event.data.to
-        if current == nil then return end
-        for i = table.indexOf(self.players, current), #self.players do
-          table.insert(new_turn_table, self.players[i])
-        end
+  if not round_event then return end
+  local turn_table = round_event.data.turn_table
+  if turn_table then
+    local new_turn_table = {}
+    if players then
+      new_turn_table = table.simpleClone(players)
+    else
+      local current = round_event.data.to
+      if current == nil then return end
+      for i = table.indexOf(self.players, current), #self.players do
+        table.insert(new_turn_table, self.players[i])
       end
-      round_event.data.turn_table = new_turn_table
     end
+    round_event.data.turn_table = new_turn_table
   end
 end
 
@@ -3786,6 +3785,7 @@ end
 ---@field role string? 身份，默认反贼（呃）
 ---@field role_shown boolean? 身份可见？默认不可见
 ---@field skip_preparation boolean? 跳过初始化流程？可用于游戏模式logic的早期环节
+---@field send_log boolean? 是否发一句log，默认发
 
 --- 创建一个人机作为新玩家加入场上，必须通过参数指定座位，还可以指定其他参数
 ---@param nextPlayer ServerPlayer 新玩家的下家
@@ -3831,6 +3831,49 @@ function Room:addNpc(nextPlayer, params)
 
   -- 以上应该就是初始化一个角色的流程吧
   -- 初始手牌不做
+
+  -- 更新额定回合表。。
+  self:arrangeTurn()
+
+  return ret
+end
+
+--- 增加更多默认条件与限制条件的addNpc，推荐用这个
+---
+--- - 默认由operator操控召唤的人机
+--- - 默认与operator同阵营
+--- - 身份可见性与operator一致
+--- - 游戏人数不得超过12否则会返回nil
+---@param operator ServerPlayer
+---@param nextPlayer ServerPlayer
+---@param params? AddNpcParams
+---@return ServerPlayer?
+function Room:summonPlayer(operator, nextPlayer, params)
+  if #self.players >= 12 then return nil end
+  params = params or {}
+  params.controller = params.controller or operator._splayer
+  if params.send_log == nil then params.send_log = true end
+  if not params.role then
+    params.role = operator.role
+    if operator.role == "lord" then
+      params.role = "loyalist"
+    end
+  end
+
+  if params.role_shown == nil then
+    params.role_shown = operator.role_shown
+  end
+
+  local ret = self:addNpc(nextPlayer, params)
+
+  if params.send_log then
+    self:sendLog {
+      type = "#SummonPlayer",
+      from = ret.id,
+      to = { nextPlayer.id },
+      arg = ret.serverplayer:getScreenName(),
+    }
+  end
 
   return ret
 end

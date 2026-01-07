@@ -782,6 +782,7 @@ Fk:loadTranslationTable {
   ["$ShuffleDrawPile"] = "已重新洗牌，牌堆现有 %arg 张牌",
   ["#ChangeController"] = "%from 现在由玩家 %arg 操控",
   ["#QuitControl"] = "%from 现在由玩家 %arg2 操控，因为玩家 %arg 解除了操控",
+  ["#SummonPlayer"] = "%from 被召唤到场上，下家为 %to，听从玩家 %arg 指示",
 }
 
 -- card footnote

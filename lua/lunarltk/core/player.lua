@@ -45,15 +45,15 @@ local Player = basePlayer:subclass("Player")
 
 ---@alias Phase integer
 
-Player.RoundStart = 1
-Player.Start = 2
-Player.Judge = 3
-Player.Draw = 4
-Player.Play = 5
-Player.Discard = 6
-Player.Finish = 7
-Player.NotActive = 8
-Player.PhaseNone = 9
+Player.RoundStart = 1     -- 回合开始阶段(不要用)
+Player.Start = 2          -- 准备阶段
+Player.Judge = 3          -- 判定阶段
+Player.Draw = 4           -- 摸牌阶段
+Player.Play = 5           -- 出牌阶段
+Player.Discard = 6        -- 弃牌阶段
+Player.Finish = 7         -- 结束阶段
+Player.NotActive = 8      -- 不活跃阶段(回合外)
+Player.PhaseNone = 9      -- 无阶段(阶段之间的间隙)
 
 ---@alias PlayerCardArea integer
 

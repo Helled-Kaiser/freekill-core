@@ -172,6 +172,7 @@ function Round:action()
   end
 
   while true do
+    -- 此为本轮游戏的额定回合表，每次循环中都会剔除一个
     data.turn_table = data.turn_table or {}
     if #data.turn_table == 0 then
       data.turn_table = table.simpleClone(room.players)
