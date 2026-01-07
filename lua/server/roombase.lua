@@ -301,8 +301,11 @@ function ServerRoomBase:shouldUpdateWinRate()
   if os.time() - self.start_time < 45 then
     return false
   end
+
+  -- 由于召唤术的存在，人机不能一刀切的不算分
+  -- 话说为什么这玩意在ServerRoomBase，还有顶上的自选武将，这乱套了啊
   for _, p in ipairs(self.players) do
-    if p.id < 0 then return false end
+    if p.id < 0 and (p._controller_stack or {})[1] == p._splayer then return false end
   end
   return Fk.game_modes[self:getSettings('gameMode')]:countInFunc(self)
 end
