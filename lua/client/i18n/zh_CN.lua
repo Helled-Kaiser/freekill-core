@@ -780,6 +780,8 @@ Fk:loadTranslationTable {
   ["#Choice"] = "%from 选择 %arg",
   ["#WatchCard"] = "%from 观看了牌 %card",
   ["$ShuffleDrawPile"] = "已重新洗牌，牌堆现有 %arg 张牌",
+  ["#ChangeController"] = "%from 现在由玩家 %arg 操控",
+  ["#QuitControl"] = "%from 现在由玩家 %arg2 操控，因为玩家 %arg 解除了操控",
 }
 
 -- card footnote
