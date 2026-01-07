@@ -238,6 +238,7 @@ W.PageBase {
         onClicked: {
           Cpp.notifyServer("Trust", "");
           trustBtn.enabled = false;
+          roomScene.state = "notactive";
         }
       }
       MetroButton {
@@ -848,9 +849,6 @@ W.PageBase {
       state = "leave";
     }
     model.netstate = state;
-    if (state === "trust" && id === Self.id) {
-      roomScene.state = "notactive";
-    }
   }
 
   function updateMarkArea(sender, data) {
