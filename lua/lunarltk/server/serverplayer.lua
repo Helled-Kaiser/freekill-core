@@ -753,11 +753,11 @@ local function updateControllerUI(player)
   end
 end
 
---- 让自己的玩家取得角色p的控制权。注意归还控制权时请使用uncontrol函数而不是让他控制自己。
+--- 让自己的初始控制者取得角色p的控制权。注意归还控制权时请使用uncontrol函数而不是让他控制自己。
 ---@param p ServerPlayer
 function ServerPlayer:control(p)
   local tab = p._controller_stack
-  table.insert(tab, self._splayer)
+  table.insert(tab, self._controller_stack[1])
   p.serverplayer = tab[#tab]
   self.room:sendLog {
     type = "#ChangeController",
@@ -767,7 +767,7 @@ function ServerPlayer:control(p)
   updateControllerUI(p)
 end
 
---- 让出角色p的控制权，这样p就由上个控制他的玩家控制。不能让出初始玩家的控制权
+--- 让出自己的初始控制者角色p的控制权，这样p就由上个控制他的玩家控制。不能让出初始玩家的控制权
 ---
 --- 这个函数会把玩家self从控制列表删除，如果角色p此时由self操控则会引起控制权变更。
 ---@param p ServerPlayer
@@ -776,7 +776,7 @@ function ServerPlayer:uncontrol(p)
   if #tab == 1 then return end
   local givenUp = false
   for i = #tab, 2, -1 do
-    if tab[i] == self._splayer then
+    if tab[i] == self._controller_stack[1] then
       givenUp = true
       table.remove(tab, i)
       break
@@ -787,20 +787,20 @@ function ServerPlayer:uncontrol(p)
     self.room:sendLog {
       type = "#QuitControl",
       from = p.id,
-      arg = self._splayer:getScreenName(),
+      arg = self._controller_stack[1]:getScreenName(),
       arg2 = p.serverplayer:getScreenName(),
     }
   end
   updateControllerUI(p)
 end
 
---- 自己的玩家是否控制着角色p？
+--- 自己的初始控制者是否控制着角色p？
 ---@param p ServerPlayer
 function ServerPlayer:isControlling(p)
-  return p.serverplayer == self._splayer
+  return p.serverplayer == self._controller_stack[1]
 end
 
---- 将本角色的最初控制者设为玩家p。见于统率三军等需要召唤机器人的模式
+--- 将本角色的初始控制者设为玩家p。见于统率三军等需要召唤机器人的模式
 ---@param p fk.ServerPlayer
 function ServerPlayer:changeInitController(p)
   self._controller_stack[1] = p
