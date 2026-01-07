@@ -802,7 +802,7 @@ end
 
 --- 将本角色的初始控制者设为玩家p。见于统率三军等需要召唤机器人的模式
 ---@param p fk.ServerPlayer
-function ServerPlayer:changeInitController(p)
+function ServerPlayer:setInitController(p)
   self._controller_stack[1] = p
   self.serverplayer = self._controller_stack[#self._controller_stack]
   updateControllerUI(self)

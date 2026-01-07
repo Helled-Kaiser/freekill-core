@@ -3779,10 +3779,58 @@ function Room:destroyTableCardByEvent(id)
   self:doBroadcastNotify("DestroyTableCardByEvent", id)
 end
 
-function Room:addNpc(nextPlayer)
-  local ret = ServerRoomBase.addNpc(self, nextPlayer)
+---@class AddNpcParams
+---@field controller fk.ServerPlayer? 这名人机的初始控制者，默认人机自己
+---@field general string? 初始武将，默认男士兵，不支持隐匿
+---@field deputy string? 初始副将
+---@field role string? 身份，默认反贼（呃）
+---@field role_shown boolean? 身份可见？默认不可见
+---@field skip_preparation boolean? 跳过初始化流程？可用于游戏模式logic的早期环节
+
+--- 创建一个人机作为新玩家加入场上，必须通过参数指定座位，还可以指定其他参数
+---@param nextPlayer ServerPlayer 新玩家的下家
+---@param params? AddNpcParams 更多数据
+---@return ServerPlayer
+function Room:addNpc(nextPlayer, params)
+  params = params or Util.DummyTable --[[@as AddNpcParams]]
+  local ret = ServerRoomBase.addNpc(self, nextPlayer) --[[@as ServerPlayer]]
 
   self.alive_players = table.filter(self.players, function(p) return not p.dead end)
+
+  -- 在三国杀中，中途加入一个人机光是有个玩家还不够，得走一次开始游戏之前的流程
+  -- 不过底下这堆东西为什么没有封装啊
+
+  if params.controller then
+    ret:setInitController(params.controller)
+  end
+
+  -- 如果不需要初始化，就不弄接下来这堆了
+  if params.skip_preparation then
+    return ret
+  end
+
+  local logic = self.logic
+
+  -- 分配身份
+  self:setPlayerProperty(ret, "role_shown", not not params.role_shown)
+  self:setPlayerProperty(ret, "role", params.role or "rebel")
+
+  -- 选将与亮将
+  local general = params.general or "blank_shibing"
+  local deputy = params.deputy or ""
+
+  -- 有些模式不启用隐匿，不使用prepareGeneral
+  -- 我也不知道prepareGeneral这种身份局专用的函数为什么要在room类底下
+  self:setPlayerGeneral(ret, general, true, true)
+  ret.deputyGeneral = deputy
+  logic:broadcastGeneralForPlayer(ret)
+  logic:recordInitialGeneral(ret)
+
+  -- 分配技能
+  logic:attachGeneralSkillsToPlayer(ret)
+
+  -- 以上应该就是初始化一个角色的流程吧
+  -- 初始手牌不做
 
   return ret
 end
