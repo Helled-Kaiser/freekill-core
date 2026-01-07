@@ -346,6 +346,7 @@ fk.CardUseFinished = UseCardEvent:subclass("fk.CardUseFinished")
 ---@field public cancelled? boolean @ 是否已被取消
 ---@field public fixedResponseTimesList? table<ServerPlayer, integer> @ 某角色响应此事件需要的牌张数（如杀响应决斗），键为角色，值为响应张数
 ---@field public extra_data? UseExtraData | table @ 额外数据
+---@field public currentExtraData? UseExtraData | table @ 额外数据（仅当前目标，继承给对应生效事件）
 
 --- 使用牌的数据
 ---@class AimData: AimDataSpec, TriggerData
@@ -670,6 +671,7 @@ fk.TargetConfirmed = AimEvent:subclass("fk.TargetConfirmed")
 ---@field public prohibitedCardNames? string[] @ 这些牌名的牌不可响应此牌
 ---@field public disresponsiveList? ServerPlayer[] @ 这些角色不可响应此牌（晚于use.disresponsiveList）
 ---@field public unoffsetableList? ServerPlayer[] @ 这些角色不可抵消此牌（晚于use.unoffsetableList）
+---@field public currentExtraData? UseExtraData | table @ 额外数据（仅当前目标，继承给对应生效事件）
 
 --- 卡牌效果的数据
 ---@class CardEffectData: CardEffectDataSpec, TriggerData

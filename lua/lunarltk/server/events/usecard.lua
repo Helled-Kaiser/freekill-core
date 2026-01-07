@@ -776,6 +776,7 @@ function UseCardEventWrappers:doCardUseEffect(useCardData)
           cardEffectData.unoffsetable = curAimEvent.unoffsetable
           cardEffectData.nullified = curAimEvent.nullified
           cardEffectData.fixedResponseTimesList = curAimEvent.fixedResponseTimesList
+          cardEffectData.currentExtraData = curAimEvent.currentExtraData
 
           collaboratorsIndex[to] = collaboratorsIndex[to] + 1
 
