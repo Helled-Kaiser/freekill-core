@@ -33,6 +33,7 @@ local baseEngine = require "core.engine"
 ---@field public target_tips table<string, TargetTipSpec> @ 选择目标提示对应表
 ---@field public choose_general_rule table<string, ChooseGeneralSpec> @ 选将框操作方法表
 ---@field public skin_packages table<string, string[]> @ Skins
+---@field public personal_marks table<string, PersonalMarkSpec> @ PersonalMark
 local Engine = baseEngine:subclass("Engine")
 Engine:include(modManager)
 
@@ -85,6 +86,7 @@ function Engine:initialize()
   self.target_tips = {}
   self.choose_general_rule = {}
   self.skin_packages = {}
+  self.personal_marks = {}
 
   self.Ltk = {
     AIStrategy = require 'lunarltk.server.ai.strategy',
@@ -641,6 +643,11 @@ end
 
 function Engine:getSkinsByGeneral(general)
   return self.skin_packages[general] or {}
+end
+
+---@param mark_spec PersonalMarkSpec
+function Engine:addPersonalMark(mark_spec)
+  self.personal_marks[mark_spec.name] = mark_spec
 end
 
 return Engine
