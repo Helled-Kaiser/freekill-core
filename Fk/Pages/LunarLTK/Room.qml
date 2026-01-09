@@ -92,7 +92,7 @@ W.PageBase {
             popupBox.item.finished();
           }
 
-          Lua.call("FinishRequestUI");
+          Ltk.finishRequestUI();
           applyChange({});
         }
       }
@@ -167,12 +167,12 @@ W.PageBase {
 
         onSelectedChanged: {
           if ( state === "candidate" )
-            Lua.call("UpdateRequestUI", "Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
+            Ltk.updateRequestUI("Photo", playerid, "click", { selected, autoTarget: Config.autoTarget } );
         }
 
         onDoubleTappedChanged: {
           if (doubleTapped && enabled) {
-            // Lua.call("UpdateRequestUI", "Photo", playerid, "doubleClick", { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } )
+            // Ltk.updateRequestUI("Photo", playerid, "doubleClick", { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget } )
             doubleTapped = false;
           }
         }
@@ -246,16 +246,13 @@ W.PageBase {
         text: Lua.tr("Revert Selection")
         textFont.pixelSize: 28
         enabled: dashboard.pending_skill !== ""
-        onClicked: //dashboard.revertSelection();
-        {
-          Lua.call("RevertSelection");
-        }
+        onClicked: Ltk.revertSelection();
       }
       MetroButton {
         id: sortBtn
         text: Lua.tr("Sort Cards")
         textFont.pixelSize: 28
-        enabled: dashboard.sortable// Lua.call("CanSortHandcards", Self.id)
+        enabled: dashboard.sortable
         onClicked: {
           if (dashboard.sortable) {
             let sortMethods = [];
@@ -462,7 +459,7 @@ W.PageBase {
             text: Lua.tr(modelData)
             checked: index === 0
             onCheckedChanged: {
-              Lua.call("UpdateRequestUI", "SpecialSkills", "1", "click", modelData);
+              Ltk.updateRequestUI("SpecialSkills", "1", "click", modelData);
             }
           }
         }
@@ -491,7 +488,7 @@ W.PageBase {
                  && !skippedUseEventId.find(id => id === extra_data.useEventId)
         onClicked: {
           skippedUseEventId.push(extra_data.useEventId);
-          Lua.call("UpdateRequestUI", "Button", "Cancel");
+          Ltk.updateRequestUI("Button", "Cancel");
         }
       }
 
@@ -499,14 +496,14 @@ W.PageBase {
         id: okButton
         enabled: false
         text: Lua.tr("OK")
-        onClicked: Lua.call("UpdateRequestUI", "Button", "OK");
+        onClicked: Ltk.updateRequestUI("Button", "OK");
       }
 
       Button {
         id: cancelButton
         enabled: false
         text: Lua.tr("Cancel")
-        onClicked: Lua.call("UpdateRequestUI", "Button", "Cancel");
+        onClicked: Ltk.updateRequestUI("Button", "Cancel");
       }
     }
 
@@ -518,7 +515,7 @@ W.PageBase {
       anchors.right: parent.right
       anchors.rightMargin: 30
       visible: false;
-      onClicked: Lua.call("UpdateRequestUI", "Button", "End");
+      onClicked: Ltk.updateRequestUI("Button", "End");
     }
   }
 
@@ -578,7 +575,7 @@ W.PageBase {
     if (action === "click") data = { selected, autoTarget: Config.autoTarget };
     else if (action === "doubleClick") data = { selected, doubleClickUse: Config.doubleClickUse, autoTarget: Config.autoTarget };
     else data = { selected };
-    Lua.call("UpdateRequestUI", "SkillButton", skill_name, action, data);
+    Ltk.updateRequestUI("SkillButton", skill_name, action, data);
   }
 
   W.PopupLoader {
@@ -651,14 +648,14 @@ W.PageBase {
   Shortcut {
     sequence: "Return"
     enabled: okButton.enabled
-    onActivated: Lua.call("UpdateRequestUI", "Button", "OK");
+    onActivated: Ltk.updateRequestUI("Button", "OK");
   }
 
   Shortcut {
     sequence: "Space"
     enabled: cancelButton.enabled || endPhaseButton.visible;
     onActivated: if (cancelButton.enabled) {
-      Lua.call("UpdateRequestUI", "Button", "Cancel");
+      Ltk.updateRequestUI("Button", "Cancel");
     } else {
       Logic.replyToServer("");
     }
@@ -670,7 +667,7 @@ W.PageBase {
     running: true
     repeat: true
     onTriggered: {
-      Lua.call("RefreshStatusSkills");
+      Ltk.refreshStatusSkills();
       // FIXME 本来可以用客户端notifyUI(AddObserver)刷旁观列表的
       // FIXME 但是由于重启智慧所以还是加入一秒0.2刷得了
       // 刷托管按钮
@@ -685,7 +682,7 @@ W.PageBase {
     for (let i = 0; i < photoModel.count; i++) {
       const item = photos.itemAt(i);
       if (show) {
-        item.distance = Lua.call("DistanceTo", Self.id, item.playerid);
+        item.distance = Ltk.distanceTo(Self.id, item.playerid);
       } else {
         item.distance = -1;
       }
@@ -751,7 +748,7 @@ W.PageBase {
     });
     for (let i = 0; i < photoModel.count; i++) {
       const item = photos.itemAt(i);
-      item.targetTip = Lua.call("GetTargetTip", item.playerid);
+      item.targetTip = Ltk.getTargetTip(item.playerid);
     }
 
     const buttons = uiUpdate["Button"];

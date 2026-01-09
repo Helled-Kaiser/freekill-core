@@ -1,6 +1,6 @@
 module Fk.Components.LunarLTK
 
-singleton LTK 1.0 LTKLuaUtil.qml
+singleton Ltk 1.0 LTKLuaUtil.qml
 
 CardArea 1.0 CardArea.qml
 CardItem 1.0 CardItem.qml
