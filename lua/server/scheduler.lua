@@ -162,3 +162,9 @@ end
 if FileIO.pwd():endsWith("packages/freekill-core") then
   FileIO.cd("../..")
 end
+
+-- 此为服务端入口lua的末尾，服务端VM等待调试器
+if fk._VscodeDbgEnabled == "server" then
+  fk._VscodeDbgWait(5928)
+  -- fk._VscodeDbgAttach()
+end

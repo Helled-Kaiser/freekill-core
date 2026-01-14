@@ -64,3 +64,9 @@ dofile "lua/client/client_util.lua"
 if FileIO.pwd():endsWith("packages/freekill-core") then
   FileIO.cd("../..")
 end
+
+-- 此为client.lua的末尾，客户端VM等待调试器
+-- 由于可能的bug，暂时不开启
+if fk._VscodeDbgEnabled == "client" then
+  fk._VscodeDbgWait(5927)
+end
