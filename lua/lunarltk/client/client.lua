@@ -325,6 +325,7 @@ local function separateMoves(moves)
         moveReason = move.moveReason,
         specialName = move.specialName,
         fromSpecialName = info.fromSpecialName,
+        skillName = move.skillName,
         proposer = move.proposer,
         drawPilePosition = move.drawPilePosition,
       })
@@ -351,6 +352,7 @@ local function mergeMoves(moves)
         moveReason = move.moveReason,
         specialName = move.specialName,
         fromSpecialName = move.fromSpecialName,
+        skillName = move.skillName,
         proposer = move.proposer,
         drawPilePosition = move.drawPilePosition,
       }
@@ -379,13 +381,17 @@ local function sendMoveCardLog(move, visible_data)
     logCards = vcard and { vcard } or logCards
   end
 
+  local skillName = Fk:translate(move.skillName) or ""
+  if skillName ~= "" then skillName = "</b><font color='gray'>(" .. skillName .. ")</font><b>" end
+
   if move.toArea == Card.PlayerHand then
     if move.fromArea == Card.PlayerSpecial then
       client:appendLog({
         type = "$GetCardsFromPile",
         from = move.to,
-        arg = move.fromSpecialName,
-        arg2 = #move.ids,
+        arg = #move.ids,
+        arg2 = skillName,
+        arg3 = move.fromSpecialName,
         card = logCards,
       }, visible_data)
     elseif move.fromArea == Card.DrawPile then
@@ -394,6 +400,7 @@ local function sendMoveCardLog(move, visible_data)
         from = move.to,
         card = logCards,
         arg = #move.ids,
+        arg2 = skillName,
       }, visible_data)
     elseif move.fromArea == Card.Processing then
       client:appendLog({
@@ -401,6 +408,7 @@ local function sendMoveCardLog(move, visible_data)
         from = move.to,
         card = logCards,
         arg = #move.ids,
+        arg2 = skillName,
       }, visible_data)
     elseif move.fromArea == Card.DiscardPile then
       client:appendLog({
@@ -408,13 +416,15 @@ local function sendMoveCardLog(move, visible_data)
         from = move.to,
         card = logCards,
         arg = #move.ids,
+        arg2 = skillName,
       }, visible_data)
     elseif move.from then
       client:appendLog({
-        type = "$MoveCards",
+        type = move.moveReason == fk.ReasonGive and "$GiveCards" or "$MoveCards",
         from = move.from,
         to = { move.to },
         arg = #move.ids,
+        arg2 = skillName,
         card = logCards,
       }, visible_data)
     else
@@ -423,6 +433,7 @@ local function sendMoveCardLog(move, visible_data)
         from = move.to,
         card = logCards,
         arg = #move.ids,
+        arg2 = skillName,
       }, visible_data)
     end
   elseif move.toArea == Card.PlayerEquip then
@@ -431,12 +442,14 @@ local function sendMoveCardLog(move, visible_data)
         type = "$LightningMove",
         from = move.from,
         to = { move.to },
+        arg2 = skillName,
         card = logCards,
       }, visible_data)
     else
       client:appendLog({
         type = "$InstallEquip",
         from = move.to,
+        arg2 = skillName,
         card = logCards,
       }, visible_data)
     end
@@ -446,6 +459,7 @@ local function sendMoveCardLog(move, visible_data)
         type = "$LightningMove",
         from = move.from,
         to = { move.to },
+        arg2 = skillName,
         card = logCards,
       }, visible_data)
     elseif move.from then
@@ -453,14 +467,16 @@ local function sendMoveCardLog(move, visible_data)
         type = "$PasteCard",
         from = move.from,
         to = { move.to },
+        arg2 = skillName,
         card = logCards,
       }, visible_data)
     end
   elseif move.toArea == Card.PlayerSpecial then
     client:appendLog({
       type = "$AddToPile",
-      arg = move.specialName,
-      arg2 = #move.ids,
+      arg = #move.ids,
+      arg2 = skillName,
+      arg3 = move.specialName,
       from = move.to,
       card = logCards,
     }, visible_data)
@@ -480,8 +496,9 @@ local function sendMoveCardLog(move, visible_data)
       type = msgtype,
       from = move.from,
       card = logCards,
-      arg = arg,
-      arg2 = #move.ids,
+      arg = #move.ids,
+      arg2 = skillName,
+      arg3 = arg,
     }, visible_data)
     client:setCardNote(move.ids, {
       type = "$$PutCard",
@@ -491,6 +508,7 @@ local function sendMoveCardLog(move, visible_data)
     client:appendLog({
       type = "$UninstallEquip",
       from = move.from,
+      arg2 = skillName,
       card = logCards,
     }, visible_data)
   elseif move.toArea == Card.Processing then
@@ -500,6 +518,7 @@ local function sendMoveCardLog(move, visible_data)
           type = "$ViewCardFromDrawPile",
           from = move.proposer,
           arg = #move.ids,
+          arg2 = skillName,
         }, visible_data)
       else
         client:appendLog({
@@ -507,6 +526,7 @@ local function sendMoveCardLog(move, visible_data)
           from = move.proposer,
           card = logCards,
           arg = #move.ids,
+          arg2 = skillName,
         }, visible_data)
         client:setCardNote(move.ids, {
           type = "$$TurnOverCard",
@@ -523,6 +543,7 @@ local function sendMoveCardLog(move, visible_data)
           to = {move.proposer},
           card = logCards,
           arg = #move.ids,
+          arg2 = skillName,
         }, visible_data)
       else
         client:appendLog({
@@ -530,6 +551,7 @@ local function sendMoveCardLog(move, visible_data)
           from = move.from,
           card = logCards,
           arg = #move.ids,
+          arg2 = skillName,
         }, visible_data)
       end
     elseif move.moveReason == fk.ReasonPutIntoDiscardPile then
@@ -537,6 +559,7 @@ local function sendMoveCardLog(move, visible_data)
         type = "$PutToDiscard",
         card = logCards,
         arg = #move.ids,
+        arg2 = skillName,
       }, visible_data)
     end
   -- elseif move.toArea == Card.Void then

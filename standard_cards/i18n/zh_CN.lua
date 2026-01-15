@@ -112,10 +112,12 @@ Fk:loadTranslationTable{
   ["collateral"] = "借刀杀人",
   [":collateral"] = "锦囊牌<br /><b>时机</b>：出牌阶段<br /><b>目标</b>：装备区里有武器牌且攻击范围内有【杀】的合法目标的一名其他角色A（你需要选择一名A攻击范围内的【杀】的合法目标B）<br /><b>效果</b>：A需对B使用一张【杀】，否则将装备区里的武器牌交给你。",
   ["#collateral-slash"] = "借刀杀人：你需对 %dest 使用【杀】，否则将你的装备区里的武器牌交给 %src",
+  ["collateral_skill"] = "借刀杀人",
   ["#collateral_skill"] = "选择装备区里有武器牌且攻击范围内有【杀】的合法目标的一名其他角色A，<br />再选择一名A攻击范围内的【杀】的合法目标B。A需对B使用【杀】，否则将装备区里的武器牌交给你",
 
   ["ex_nihilo"] = "无中生有",
   [":ex_nihilo"] = "锦囊牌<br /><b>时机</b>：出牌阶段<br /><b>目标</b>：你<br /><b>效果</b>：目标角色摸两张牌。",
+  ["ex_nihilo_skill"] = "无中生有",
   ["#ex_nihilo_skill"] = "你摸两张牌",
 
   ["nullification"] = "无懈可击",
@@ -135,7 +137,7 @@ Fk:loadTranslationTable{
 
   ["amazing_grace"] = "五谷丰登",
   [":amazing_grace"] = "锦囊牌<br /><b>时机</b>：出牌阶段<br /><b>目标</b>：所有角色<br /><b>效果</b>：亮出牌堆顶等于目标角色数的牌，每名目标角色获得其中一张牌，结算结束后将其余的牌置入弃牌堆。",
-  ["amazing_grace_skill"] = "五谷选牌",
+  ["amazing_grace_skill"] = "五谷丰登",
   ["Please choose cards"] = "请选择一张卡牌",
   ["#amazing_grace_skill"] = "亮出牌堆顶等于所有角色数的牌，每名角色获得其中一张牌",
 

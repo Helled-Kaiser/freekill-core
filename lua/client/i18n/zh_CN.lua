@@ -668,31 +668,32 @@ Fk:loadTranslationTable {
   ["#LoseSkill"] = "%from 失去了〖%arg〗",
 
   -- moveCards (they are sent by notifyMoveCards)
-  ["$GetCardsFromPile"] = "%from 从 %arg 中获得了 %arg2 张牌 %card",
-  ["$DrawCards"] = "%from 摸了 %arg 张牌 %card",
-  ["$MoveCards"] = "%to 从 %from 处获得了 %arg 张牌 %card",
-  ["$PreyCardsFromPile"] = "%from 获得了 %arg 张牌 %card",
-  ["$GotCardBack"] = "%from 收回了 %arg 张牌 %card",
-  ["$RecycleCard"] = "%from 从弃牌堆回收了 %arg 张牌 %card",
+  ["$GetCardsFromPile"] = "%from 从 %arg3 中获得了 %arg 张牌 %card %arg2",
+  ["$DrawCards"] = "%from 摸了 %arg 张牌 %card %arg2",
+  ["$MoveCards"] = "%to 从 %from 处获得了 %arg 张牌 %card %arg2",
+  ["$GiveCards"] = "%from 交给了 %to %arg 张牌 %card %arg2",
+  ["$PreyCardsFromPile"] = "%from 获得了 %arg 张牌 %card %arg2",
+  ["$GotCardBack"] = "%from 收回了 %arg 张牌 %card %arg2",
+  ["$RecycleCard"] = "%from 从弃牌堆回收了 %arg 张牌 %card %arg2",
   ["#DestructCards"] = "%card 被销毁了",
 
-  ["$InstallEquip"] = "%from 装备了 %card",
-  ["$UninstallEquip"] = "%from 卸载了 %card",
-  ["$InstallVirtualEquip"] = "%from 装备了 %arg (转化自 %card)",
-  ["$UninstallVirtualEquip"] = "%from 卸载了 %arg (转化自 %card)",
+  ["$InstallEquip"] = "%from 装备了 %card %arg2",
+  ["$UninstallEquip"] = "%from 卸载了 %card %arg2",
+  ["$InstallVirtualEquip"] = "%from 装备了 %arg (转化自 %card) %arg2",
+  ["$UninstallVirtualEquip"] = "%from 卸载了 %arg (转化自 %card) %arg2",
 
-  ["$LightningMove"] = "%card 从 %from 转移到了 %to",
-  ["$PasteCard"] = "%from 给 %to 贴了张 %card",
+  ["$LightningMove"] = "%card 从 %from 转移到了 %to %arg2",
+  ["$PasteCard"] = "%from 给 %to 贴了张 %card %arg2",
 
-  ["$AddToPile"] = "%arg2 张牌 %card 被作为 %from 的 %arg 移出游戏",
+  ["$AddToPile"] = "%arg 张牌 %card 被作为 %from 的 %arg3 移出游戏 %arg2",
 
-  ["$PutCard"] = "%from 的 %arg2 张牌 %card 被置于 %arg",
-  ["$PutCardNoFrom"] = "%arg2 张牌 %card 被置于 %arg",
-  ["$DiscardCards"] = "%from 弃置了 %arg 张牌 %card",
-  ["$DiscardOther"] = "%to 弃置了 %from 的 %arg 张牌 %card",
-  ["$PutToDiscard"] = "%arg 张牌 %card 被置入弃牌堆",
-  ["$ViewCardFromDrawPile"] = "%from 观看了 %arg 张牌",
-  ["$TurnOverCardFromDrawPile"] = "%from 亮出了 %arg 张牌 %card",
+  ["$PutCard"] = "%from 的 %arg 张牌 %card 被置于 %arg3 %arg2",
+  ["$PutCardNoFrom"] = "%arg 张牌 %card 被置于 %arg3 %arg2",
+  ["$DiscardCards"] = "%from 弃置了 %arg 张牌 %card %arg2",
+  ["$DiscardOther"] = "%to 弃置了 %from 的 %arg 张牌 %card %arg2",
+  ["$PutToDiscard"] = "%arg 张牌 %card 被置入弃牌堆 %arg2",
+  ["$ViewCardFromDrawPile"] = "%from 观看了 %arg 张牌 %arg2",
+  ["$TurnOverCardFromDrawPile"] = "%from 亮出了 %arg 张牌 %card %arg2",
 
   ["#AbortArea"] = "%from 的 %arg 被废除",
   ["#ResumeArea"] = "%from 的 %arg 被恢复",
@@ -700,7 +701,7 @@ Fk:loadTranslationTable {
 
   ["#ShowCard"] = "%from 展示了牌 %card",
   ["#Recast"] = "%from 重铸了 %card",
-  ["#RecastBySkill"] = "%from 因 “%arg” 重铸了 %card",
+  ["#RecastBySkill"] = "%from 重铸了 %card (%arg)",
 
   -- phase
   ["#PhaseSkipped"] = "%from 跳过了 %arg",
