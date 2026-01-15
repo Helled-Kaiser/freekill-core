@@ -120,7 +120,7 @@ Item {
               if (index === 0) {
                 root.selected_skin = "-";
               } else {
-                root.selected_skin = source;
+                root.selected_skin = modelData;
               }
               
               for (let i = 0; i < skinsRepeater.count; i++) {
@@ -194,7 +194,7 @@ Item {
               if (index === 0) {
                 root.selected_deputy_skin = "-";
               } else {
-                root.selected_deputy_skin = source;
+                root.selected_deputy_skin = modelData;
               }
               for (let i = 0; i < deputySkinsRepeater.count; i++) {
                 if (i !== index) {

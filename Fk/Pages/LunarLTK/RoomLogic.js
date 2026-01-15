@@ -1535,13 +1535,13 @@ callbacks["ChangeSkin"] = (sender, data) => {
     if (Number(data[0]) === Self.id) {
       Config.enabledSkins[photo.general] = path === "-" ? "" : path;
     }
-    photo.skinSource = path === "-" ? "" : path;
+    photo.skinSource = path === "-" ? "" : (AppPath + "/" + path);
   }
   if (deputypath) {
     if (Number(data[0]) === Self.id) {
       Config.enabledSkins[photo.deputyGeneral] = deputypath === "-" ? "" : deputypath;
     }
-    photo.deputySkinSource = deputypath === "-" ? "" : deputypath;
+    photo.deputySkinSource = deputypath === "-" ? "" : (AppPath + "/" + deputypath);
   }
   photo.changeSkinTimer.start()
 }

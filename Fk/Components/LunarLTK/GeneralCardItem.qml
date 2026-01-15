@@ -39,7 +39,7 @@ Game.BasicCard {
   property alias hasCompanions: companions.visible
 
   footnote: ""
-  cardFrontSource: (Config.enabledSkins[name] && Config.enabledSkins[name] !== "-") ? Config.enabledSkins[name] : SkinBank.getGeneralPicture(name)
+  cardFrontSource: (Config.enabledSkins[name] && Config.enabledSkins[name] !== "-") ? (Cpp.path + "/" + Config.enabledSkins[name]) : SkinBank.getGeneralPicture(name)
   cardBackSource: SkinBank.generalCardDir + 'card-back'
   glow.color: "white" //Engine.kingdomColor[kingdom]
 
