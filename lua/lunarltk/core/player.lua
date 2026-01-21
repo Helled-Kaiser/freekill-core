@@ -138,10 +138,7 @@ function Player:__tocbor()
   return cbor.encode(cbor.tagged(CBOR_TAG_PLAYER, self.id))
 end
 function Player:__touistring()
-  if self.deputyGeneral == "" then
-    return Fk:translate(self.general)
-  end
-  return Fk:translate("seat#" .. self.seat)
+  return self:toLogString()
 end
 function Player:__toqml()
   return {
@@ -1851,6 +1848,25 @@ function Player:deserialize(o)
       room:setCardArea(id, Card.PlayerSpecial, pid)
     end
   end
+end
+
+-- for sendLog
+function Player:toLogString()
+  local function getTransName(p)
+    local ret = p.general
+    ret = Fk:translate(ret)
+    if p.deputyGeneral and p.deputyGeneral ~= "" then
+      ret = ret .. "/" .. Fk:translate(p.deputyGeneral)
+    end
+    return ret
+  end
+  local name = getTransName(self)
+  for _, p2 in ipairs(Fk:currentRoom().players) do
+    if p2 ~= self and getTransName(p2) == name then
+      return Fk:translate("seat#" .. self.seat)
+    end
+  end
+  return name
 end
 
 return Player
