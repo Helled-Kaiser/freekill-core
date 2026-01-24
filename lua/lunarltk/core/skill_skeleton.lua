@@ -30,7 +30,7 @@
 
 ---@class SkillSkeleton : Object, SkillSkeletonSpec
 ---@field public effects Skill[] @ 该技能对应的所有效果
----@field public effect_names string[] @ 该技能对应的效果名
+---@field public effect_names string[] @ 该技能的各效果在记录使用纪录中所使用的名字，其中主效果的格式为`#技能名_main_skill`. 其余效果格式为`#技能名_序号_效果类型`
 ---@field public effect_spec_list ([any, any, any])[] @ 该技能对应的效果信息
 ---@field public ai_strategies { [AIStrategy]: AIStrategy[] }
 ---@field public tests fun(room: Room, me: ServerPlayer)[]
