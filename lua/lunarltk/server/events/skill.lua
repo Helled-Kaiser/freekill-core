@@ -87,6 +87,7 @@ function SkillEffect:main()
 
     if skill:hasTag(Skill.Switch) and not skill.is_delay_effect then
       local switchSkillName = skill:getSkeleton().name ---@type string
+      data.skill_data.switch_state = player:getSwitchSkillState(switchSkillName)
       room:setPlayerMark(
         player,
         MarkEnum.SwithSkillPreName .. switchSkillName,
