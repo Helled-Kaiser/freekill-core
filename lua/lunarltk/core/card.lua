@@ -356,7 +356,7 @@ function Card:addSubcard(card)
   updateColorAndNumber(self)
 end
 
---- 将一批子卡牌加入某张牌中（常用于将这批牌弃置/交给某个角色···）。
+--- 将一批子卡牌加入某张牌中
 ---@param cards integer[] | Card[] @ 要加入的子卡列表
 function Card:addSubcards(cards)
   for _, c in ipairs(cards) do
@@ -762,7 +762,6 @@ function Card:getSkill(player)
   for _, filter in ipairs(filters) do
     local skill_name = filter:cardSkillFilter(self, player)
     if skill_name then
-    print(skill_name)
       ret = Fk.skills[skill_name]
     end
   end
