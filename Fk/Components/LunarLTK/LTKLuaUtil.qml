@@ -81,8 +81,8 @@ QtObject {
     return Lua.call("GetCards", pack_name);
   }
 
-  function getCardSkill(cid) {
-    return Lua.call("GetCardSkill", cid);
+  function getCardSkill(cid, from) {
+    return Lua.call("GetCardSkill", cid, from);
   }
 
   function getCardSpecialSkills(cid) {

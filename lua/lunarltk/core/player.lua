@@ -1229,7 +1229,7 @@ end
 ---@param card Card @ 特定牌
 ---@param extra_data? UseExtraData @ 额外数据
 function Player:canUse(card, extra_data)
-  return not self:prohibitUse(card) and not not card.skill:canUse(self, card, extra_data)
+  return not self:prohibitUse(card) and not not card:getSkill(self):canUse(self, card, extra_data)
 end
 
 --- 确认玩家是否可以对特定玩家使用特定牌。
@@ -1241,7 +1241,7 @@ function Player:canUseTo(card, to, extra_data)
   local _extra = extra_data and table.simpleClone(extra_data) or {}
   _extra.fix_targets = {to.id}
   local can_use = self:canUse(card, _extra) -- for judging peach canUse correctly
-  return can_use and Util.CardTargetFilter(card.skill, self, to, {}, card.subcards, card, _extra)
+  return can_use and Util.CardTargetFilter(card:getSkill(self), self, to, {}, card.subcards, card, _extra)
 end
 
 --- 确认玩家是否可以使用/打出特定牌，考虑Fk.currentResponsePattern。
@@ -1259,7 +1259,7 @@ function Player:canUseOrResponseInCurrent(card, extra_data)
         else
           extra_data = extra_data or handler.extra_data
           return not self:prohibitUse(card) and
-            ((card.is_passive and not (extra_data or {}).not_passive) or card.skill:canUse(self, card, extra_data))
+            ((card.is_passive and not (extra_data or {}).not_passive) or card:getSkill(self):canUse(self, card, extra_data))
         end
       end
       return true
