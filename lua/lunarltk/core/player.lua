@@ -1052,6 +1052,13 @@ function Player:hasSkill(skill, ignoreNullified, ignoreAlive)
     return false
   end
 
+  local filters = Fk:currentRoom().status_skills[FilterSkill] or Util.DummyTable---@type FilterSkill[]
+  for _, filter in ipairs(filters) do
+    if filter ~= skill and table.contains(filter:skillFilter(self) or {}, skill.name) then
+      return true
+    end
+  end
+
   if self:isInstanceOf(ServerPlayer) and ---@cast self ServerPlayer
     self:isFakeSkill(skill) and
     table.contains(self.prelighted_skills, skill) then -- 预亮的技能
