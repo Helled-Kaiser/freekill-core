@@ -1280,10 +1280,13 @@ function Room:askToChooseCard(player, params)
   return result
 end
 
+---@class PoxiExtraData
+---@field visible_data? table<string, boolean> @ 牌id是否可见的映射表
+
 ---@class AskToPoxiParams
 ---@field poxi_type string @ poxi关键词
 ---@field data any @ 牌堆信息
----@field extra_data any @ 额外信息
+---@field extra_data? table|PoxiExtraData @ 额外信息
 ---@field cancelable? boolean @ 是否可取消
 
 --- 谋askForCardsChosen，需使用```Fk:addPoxiMethod```定义好方法
