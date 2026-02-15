@@ -213,7 +213,8 @@ GraphicsBox {
       let chosenInvisible = [];
       for (let j = 0; j < cards.count; j++) {
         let cid = cards.get(j).cid;
-        if (visible_data[cid.toString()] == false) {
+        const curData = visible_data[cid.toString()];
+        if (curData == false && curData !== 0) {
           invisible.push(cid);
           let k = output.indexOf(cid)
           if (k !== -1) {
