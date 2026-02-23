@@ -1258,7 +1258,7 @@ function Player:canUseOrResponseInCurrent(card, extra_data)
   if Fk.currentResponsePattern == nil then
     return self:canUse(card, extra_data)
   else
-    if Exppattern:Parse(Fk.currentResponsePattern):match(card) then
+    if card:matchVSPattern(Fk.currentResponsePattern) then
       if ClientInstance then
         local handler = ClientInstance.current_request_handler
         if handler and handler.class.name == "ReqResponseCard" then
