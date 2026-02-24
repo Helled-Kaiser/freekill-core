@@ -871,8 +871,12 @@ function Room:askToCards(player, params)
   canChosenCards = table.filter(canChosenCards, function(cid)
     return Exppattern:Parse(params.pattern):match(Fk:getCardById(cid))
   end)
-  if not params.cancelable and #canChosenCards < minNum then
-    minNum = #canChosenCards -- 防止牌不够的情况无法按确定和取消
+  if not params.cancelable then
+    if #canChosenCards == 0 then
+      return {}
+    elseif #canChosenCards < minNum then
+      minNum = #canChosenCards -- 防止牌不够的情况无法按确定和取消
+    end
   end
 
   local chosenCards = {}
@@ -1059,11 +1063,12 @@ function Room:askToChooseCardsAndPlayers(player, params)
 end
 
 ---@class AskToYijiParams: AskToChoosePlayersParams
----@field targets? ServerPlayer[] @ 可分配的目标角色，默认为所有存活角色
----@field cards? integer[] @ 要分配的卡牌。默认拥有的所有牌
+---@field targets? ServerPlayer[] @ 可分配的目标角色。**默认为所有存活角色**
+---@field cards? integer[] @ 要分配的卡牌。**默认拥有的所有牌**
 ---@field expand_pile? string|integer[] @ 可选私人牌堆名称，或额外可选牌
 ---@field single_max? integer|table @ 限制每人能获得的最大牌数。输入整数或(以角色id为键以整数为值)的表
----@field skip? boolean @ 是否跳过移动。默认不跳过
+---@field cancelable? boolean @ 是否可取消。**默认不可**
+---@field skip? boolean @ 是否跳过移动。**默认不跳过**
 ---@field moveMark? table|string @ 移动后自动赋予标记，格式：{标记名(支持-inarea后缀，移出值代表区域后清除), 值}
 
 --- 询问将卡牌分配给任意角色。
@@ -1110,13 +1115,13 @@ function Room:askToYiji(player, params)
     skillName = skillName,
   }
 
-  while maxNum > 0 and #_cards > 0 do
+  while params.cancelable or (maxNum > 0 and #_cards > 0) do
     data.max_num = maxNum
     local prompt = params.prompt or ("#AskForDistribution:::"..minNum..":"..maxNum)
     local activeParams = { ---@type AskToUseActiveSkillParams
       skill_name = "distribution_select_skill",
       prompt = prompt,
-      cancelable = minNum == 0,
+      cancelable = params.cancelable or minNum == 0,
       extra_data = data,
       no_indicate = true
     }
@@ -1137,6 +1142,7 @@ function Room:askToYiji(player, params)
     else
       break
     end
+    params.cancelable = false
   end
 
   for _, id in ipairs(cards) do
