@@ -60,9 +60,9 @@ local sendCardEmotionAndLog = function(room, useCardData, muteEmotion)
   local from = useCardData.from
   local card = useCardData.card
 
-  if not card:isVirtual() then
-    card = room:filterCard(card.id, from)
-  end
+  --if not card:isVirtual() then
+  --  card = room:filterCard(card.id, from)
+  --end
 
   if not muteEmotion then room:playCardEmotionAndSound(from, card)end
 
