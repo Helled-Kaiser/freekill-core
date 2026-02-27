@@ -1148,14 +1148,16 @@ function Room:askToYiji(player, params)
   for _, id in ipairs(cards) do
     self:setCardMark(Fk:getCardById(id), "@DistributionTo", 0)
   end
-  for _, pid in ipairs(targets) do
-    if minNum == 0 or #_cards == 0 then break end
-    local num = math.min(residueMap[toStr(pid)] or 0, minNum, #_cards)
-    if num > 0 then
-      for i = num, 1, -1 do
-        local c = table.remove(_cards, i)
-        table.insert(list[pid], c)
-        minNum = minNum - 1
+  if not params.cancelable then
+    for _, pid in ipairs(targets) do
+      if minNum == 0 or #_cards == 0 then break end
+      local num = math.min(residueMap[toStr(pid)] or 0, minNum, #_cards)
+      if num > 0 then
+        for i = num, 1, -1 do
+          local c = table.remove(_cards, i)
+          table.insert(list[pid], c)
+          minNum = minNum - 1
+        end
       end
     end
   end
