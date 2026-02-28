@@ -1927,7 +1927,7 @@ end
 
 --- 把武将牌塞回去（……）
 ---@param g string[] @ 武将名数组
----@param position? string @位置，top/bottom/random，默认random
+---@param position? "top"|"bottom"|"random" @置入牌堆顶/牌堆底/随机位置，默认置于随机位置
 ---@return boolean @ 是否成功
 function Room:returnToGeneralPile(g, position)
   position = position or "random"
