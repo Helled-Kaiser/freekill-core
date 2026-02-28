@@ -328,11 +328,6 @@ function Player:getCardIds(playerAreas, specialName)
     if str:find("h") then
       table.insert(playerAreas, Player.Hand)
     end
-    if str:find("&") then--增加特殊区域
-      for k, v in pairs(self.special_cards) do
-        if k:endsWith("&") then table.insertTable(cardIds, v) end
-      end
-    end
     if str:find("e") then
       table.insert(playerAreas, Player.Equip)
     end
@@ -377,9 +372,6 @@ end
 function Player:getHandlyIds(include_hand)
   include_hand = include_hand or include_hand == nil
   local ret = include_hand and self:getCardIds("h") or {}
-  for k, v in pairs(self.special_cards) do
-    if k:endsWith("&") then table.insertTable(ret, v) end
-  end
   local filterSkills = Fk:currentRoom().status_skills[FilterSkill] or Util.DummyTable ---@type FilterSkill[]
   for _, filter in ipairs(filterSkills) do
     local ids = filter:handlyCardsFilter(self)

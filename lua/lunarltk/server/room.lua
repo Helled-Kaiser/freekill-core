@@ -2061,16 +2061,52 @@ function Room:handleUseCardReply(player, data, params)
   else
     if data.special_skill then
       local skill = Fk.skills[data.special_skill]
-      assert(skill:isInstanceOf(ActiveSkill))
-      ---@cast skill ActiveSkill
-      local use_spec = {
-        from = player,
-        cards = { card },
-        tos = table.map(targets, Util.Id2PlayerMapper),
-      }
-      local use_data = skill:handleCostData(player, use_spec, extra_data)
-      skill:onUse(self, use_data)
-      return nil
+      if skill:isInstanceOf(ActiveSkill) then
+        ---@cast skill ActiveSkill
+        local use_spec = {
+          from = player,
+          cards = { card },
+          tos = table.map(targets, Util.Id2PlayerMapper),
+        }
+        local use_data = skill:handleCostData(player, use_spec, extra_data)
+        skill:onUse(self, use_data)
+        return nil
+      elseif skill:isInstanceOf(ViewAsSkill) then
+        ---@cast skill ViewAsSkill
+        local useResult
+        local c = skill:viewAs(player, { card })
+
+        local tos = {}
+        if #targets > 0 then
+          tos = table.map(targets, Util.Id2PlayerMapper)
+        else
+          --使用预设目标，并自动排序
+          tos = skill:fixTargets(player, { card }, nil, extra_data) or {}
+          self:sortByAction(tos)
+        end
+
+        local use_spec = {
+          from = player,
+          cards = { card },
+          tos = tos,
+          interaction_data = data.interaction_data,
+        }
+        local use_data = skill:handleCostData(player, use_spec, extra_data)
+
+        self:useSkill(player, skill, function()
+          useResult = skill:onUse(self, use_data, c, params) or ""
+          if type(useResult) == "table" then
+            if params == nil then
+              player.room:useCard(useResult)
+              skill:afterUse(player, useResult)
+              useResult = nil
+            else
+              useResult.attachedSkillAndUser = { skillName = skill.name, user = player.id, muteCard = skill.mute_card }
+            end
+          end
+        end, use_data)
+        return useResult
+      end
     end
     local use = {}
     use.from = player
