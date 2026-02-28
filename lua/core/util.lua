@@ -307,8 +307,8 @@ end
 ---@param cardEffectData CardEffectData
 Util.SlashOffsetFunc = function(room, cardEffectData)
   local params = { ---@type AskToUseCardParams
-    pattern = Fk.currentResponsePattern,
     skill_name = "jink",
+    pattern = Fk.currentResponsePattern or "jink",
     prompt = cardEffectData.extra_data.prompt,
     cancelable = true,
     event_data = cardEffectData
@@ -327,7 +327,7 @@ end
 Util.TrickOffsetFunc = function(room, cardEffectData)
   local params = { ---@type AskToUseCardParams
     skill_name = "nullification",
-    pattern = Fk.currentResponsePattern,
+    pattern = Fk.currentResponsePattern or "nullification",
     prompt = cardEffectData.extra_data.prompt,
     cancelable = true,
     extra_data = cardEffectData.extra_data,

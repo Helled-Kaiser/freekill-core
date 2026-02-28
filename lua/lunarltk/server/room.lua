@@ -3,7 +3,7 @@
 --- Room是fk游戏逻辑运行的主要场所，同时也提供了许多API函数供编写技能使用。
 ---
 --- 一个房间中只有一个Room实例，保存在RoomInstance全局变量中。
----@class Room : AbstractRoom, ServerRoomBase, GameEventWrappers, CompatAskFor
+---@class Room : AbstractRoom, ServerRoomBase, GameEventWrappers
 ---@field public extra_turn_list table @ 待执行的额外回合表
 ---@field public general_pile string[] @ 武将牌堆，这是可用武将名的数组
 ---@field public skill_costs table<string, any> @ 存放skill.cost_data用
@@ -27,12 +27,7 @@ local ServerRoomBase = Fk.Base.ServerRoomBase
 Room:include(ServerRoomBase)
 
 local GameEventWrappers = require "lunarltk.server.events"
-local CompatAskFor = require "compat.askfor"
 Room:include(GameEventWrappers)
-Room:include(CompatAskFor)
-
--- 唉，兼容个锤子牢函数
--- GameLogic:include(dofile "lua/compat/gamelogic.lua")
 
 --[[--------------------------------------------------------------------
   Room 保存着服务器端游戏房间的所有信息，比如说玩家、卡牌，以及其他信息。
