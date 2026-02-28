@@ -446,12 +446,12 @@ function CardEffect:main()
 
     effectCancellOutCheck(cardEffectData)
 
-    local skill = cardEffectData.card.skill --[[@as CardSkill]]
+    local skill = cardEffectData.skill or cardEffectData.card.skill --[[@as CardSkill]]
 
     if event == fk.PreCardEffect then
       skill:preEffect(room, cardEffectData)
     elseif event == fk.CardEffecting then
-      if cardEffectData.card.skill then
+      if skill then
         local data = { ---@type SkillEffectDataSpec
           who = cardEffectData.from,
           skill = skill,
@@ -704,7 +704,7 @@ function UseCardEventWrappers:doCardUseEffect(useCardData)
     return
   end
 
-  -- 如果是闪无懈这种直接count掉一张牌的（即有toCard时），那么简单生效一次就结束结算
+  -- 如果是闪无懈这种直接counter掉一张牌的（即有toCard时），那么简单生效一次就结束结算
   if useCardData.toCard ~= nil then
     local cardEffectData = CardEffectData:new{
       from = useCardData.from,
