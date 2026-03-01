@@ -316,7 +316,9 @@ Util.SlashOffsetFunc = function(room, cardEffectData)
   local use = room:askToUseCard(cardEffectData.to, params)
   if use then
     room:useCard(use)
-    return true
+    if cardEffectData.isCancellOut then
+      return true
+    end
   end
   return false
 end
@@ -338,7 +340,9 @@ Util.TrickOffsetFunc = function(room, cardEffectData)
     use.toCard = cardEffectData.card
     use.responseToEvent = cardEffectData
     room:useCard(use)
-    return true
+    if cardEffectData.isCancellOut then
+      return true
+    end
   end
   return false
 end
