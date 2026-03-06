@@ -45,6 +45,7 @@ Item {
           card = discardedCards[i];
           if (card.busy || inTable(card.cid) || card.holding_event_id !== 0) {
             discardedCards.splice(i, 1);
+            i--;
             continue;
           }
           card.origOpacity = 0;
@@ -95,7 +96,7 @@ Item {
 
     const to_remove = cards.filter(cd => {
       return ids.includes(cd.cid) &&
-        cd.known === !!visibleData[cd.cid.toString()];
+        (!cd.known || visibleData[cd.cid.toString()]);
     }).map(c => c.cid);
     let result = area.remove(to_remove);
     result.forEach(c => {

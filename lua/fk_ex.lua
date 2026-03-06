@@ -357,7 +357,7 @@ function fk.CreateGameMode(spec)
     ret.buildDrawPile = spec.build_draw_pile
   end
   if spec.friend_enemy_judge then
-    assert(type(spec.winner_getter) == "function")
+    assert(type(spec.friend_enemy_judge) == "function")
     ret.friendEnemyJudge = spec.friend_enemy_judge
   end
   return ret
