@@ -50,6 +50,25 @@ function CardManager:getCardArea(cardId)
   return #cardIds == 1 and cardIds[1] or Card.Unknown
 end
 
+---检测某张牌是否在某个区域
+---@param cardId integer | Card
+---@param area CardArea | CardArea[]
+---@return boolean
+function CardManager:checkCardInArea(cardId, area)
+  local areas = type(area) == "table" and area or { area }
+  return table.contains(areas, self:getCardArea(cardId))
+end
+
+---根据area过滤牌表
+---@param card integer|integer[]|Card|Card[] 传入牌表
+---@param area CardArea | CardArea[] 允许的区域
+---@return integer[]
+function CardManager:filterCardsByArea(card, area)
+  return table.filter(Card:getIdList(card), function (id)
+    return self:checkCardInArea(id, area)
+  end)
+end
+
 ---@param cardId integer | Card @ 卡牌id
 ---@return integer? @ 拥有者的id
 function CardManager:getCardOwner(cardId)
