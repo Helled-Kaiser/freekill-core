@@ -44,9 +44,7 @@ function GameLogic:run()
   local room = self.room
   table.shuffle(room.players)
 
-  for _, trig in ipairs(Fk.global_trigger) do
-    self:addTriggerSkill(trig)
-  end
+  self:prepareGlobalSkills()
 
   self:assignRoles()
   self:adjustSeats()
@@ -84,6 +82,15 @@ function GameLogic:assignRoles()
     room:broadcastProperty(p, "role")
   end
 end
+
+--- 制备全局技能
+function GameLogic:prepareGlobalSkills()
+  self:addTriggerSkill(Fk.skills["game_rule"] --[[@as TriggerSkill]])
+  for _, trig in ipairs(Fk.global_trigger) do
+    self:addTriggerSkill(trig)
+  end
+end
+
 
 --- 进行选将
 function GameLogic:chooseGenerals()
