@@ -1603,7 +1603,7 @@ function Player:isBuddy(other)
   return self.id == id or table.contains(self.buddy_list, id)
 end
 
---- 移动牌的数据（数组）
+--- 移动牌的数据（数组），注意涉及Player全是id
 ---@class MoveCardsDataIdlized: MoveCardsData
 ---@field from PlayerId
 ---@field to PlayerId
@@ -1611,7 +1611,7 @@ end
 
 --- Player是否可看到某card
 --- @param cardId integer
----@param move? MoveCardsDataIdlized|MoveCardsData @ 移动数据，注意涉及Player全是id
+---@param move? MoveCardsDataIdlized|MoveCardsData @ 移动数据
 ---@param toChoose? boolean @ 是否将用于选牌判断
 ---@return boolean
 function Player:cardVisible(cardId, move, toChoose)
