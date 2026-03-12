@@ -376,4 +376,59 @@ function CardManager:getVirtCardId(card)
   return card.virt_id
 end
 
+-- 根据提供的卡表来印卡并保存到room.tag中，已有则直接读取
+---@param cardDic table @ 卡表（卡名、花色、点数）
+---@param name string @ 保存的tag名称
+---@return integer[]
+function CardManager:prepareDeriveCards(cardDic, name)
+  local cards = self:getBanner(name)
+  if type(cards) == "table" then
+    return cards
+  end
+  cards = {}
+  for _, value in ipairs(cardDic) do
+    table.insert(cards, self:printCard(value[1], value[2], value[3]).id)
+  end
+  self:setBanner(name, cards)
+  return cards
+end
+
+-- 印一套基础牌堆中的卡（仅包含基本牌、锦囊牌，无花色点数）
+---@return integer[]
+function CardManager:prepareUniversalCards()
+  local cards = self:getBanner("universal_cards")
+  if type(cards) == "table" then
+    return cards
+  end
+  local names = {}
+  for _, id in ipairs(Fk:getAllCardIds()) do
+    local card = Fk:getCardById(id)
+    if (card.type == Card.TypeBasic or card.type == Card.TypeTrick) and not card.is_derived then
+      table.insertIfNeed(names, card.name)
+    end
+  end
+  return self:prepareDeriveCards(table.map(names, function (name)
+    return {name, Card.NoSuit, 0}
+  end), "universal_cards")
+end
+
+-- 获取基础卡牌的复印卡
+---@param guhuo_type string @ 神杀智慧，用"btd"三个字母的组合表示卡牌的类别， b 基本牌, t - 普通锦囊牌, d - 延时锦囊牌
+---@param true_name? boolean @ 是否使用真实卡名（即不区分【杀】、【无懈可击】等的具体种类）
+---@return integer[]
+function CardManager:getUniversalCards(guhuo_type, true_name)
+  local all_names, cards = {}, {}
+  for _, id in ipairs(self:prepareUniversalCards()) do
+    local card = Fk:getCardById(id)
+    if not card.is_derived and ((card.type == Card.TypeBasic and string.find(guhuo_type, "b")) or
+    (card.type == Card.TypeTrick and string.find(guhuo_type, card.sub_type == Card.SubtypeDelayedTrick and "d" or "t"))) then
+      if not (true_name and table.contains(all_names, card.trueName)) then
+        table.insert(all_names, card.trueName)
+        table.insert(cards, id)
+      end
+    end
+  end
+  return cards
+end
+
 return CardManager
