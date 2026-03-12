@@ -1648,9 +1648,9 @@ function Player:cardVisible(cardId, move, toChoose)
       oldspecial = info.fromSpecialName
       oldowner = move.from
       if move.moveVisible or move.specialVisible then return true end
-      local visiblePlayers = move.visiblePlayers
-      if visiblePlayers then
-        if visiblePlayers.class then
+      if move.visiblePlayers then
+        local visiblePlayers = move.visiblePlayers
+        if type(visiblePlayers) == "number" then
           if self:isBuddy(visiblePlayers) then
             return true
           end
