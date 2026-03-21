@@ -8,7 +8,7 @@ Item {
 
   property string configName
   property var dynamicChildObject: []
-  property var config: ({})
+  required property var config
   property bool isBoardgame: false
   property string gameModeName
   property bool needcopy: false // 有function时，会对settings进行拷贝（因为function求值的缘故）
@@ -110,7 +110,7 @@ Item {
     }
   }
 
-  function updateSettingsUI(key, newValue) {
+  function updateSettingsUI() {
     updatingData = true;
     const getUIData = Lua.fn("GetUIDataOfSettings");
     const settingsData = getUIData(root.gameModeName, root.config, root.isBoardgame) ?? [];

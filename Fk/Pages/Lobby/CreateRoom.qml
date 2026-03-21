@@ -11,6 +11,8 @@ Item {
   id: root
   anchors.fill: parent
   property bool isChangeRoom: false
+  property var config: ({})
+
   signal finish()
 
   W.SideBarSwitcher {
@@ -37,8 +39,15 @@ Item {
     currentIndex: bar.currentIndex
     RoomGeneralSettings {
       id: roomGeneralSettings
+      config: root.config
+      onSettingsUpdated: {
+        boardgameSettings.updateSettingsUI();
+        gameModeSettings.updateSettingsUI();
+        root.updateFeasible();
+      }
     }
     GameModeSelectPage {
+      id: gameModeSelectPage
       onGameModeChanged: {
         roomGeneralSettings.refreshGameMode(gameMode);
         const getUIData = Lua.fn("GetUIDataOfSettings");
@@ -49,10 +58,11 @@ Item {
         const config = {
           playerNum: roomGeneralSettings.playerNum,
           timeout: Config.preferredTimeout,
-          gameMode: Config.preferedMode,
+          gameMode,
           _game: boardgameConf,
           _mode: gameModeConf,
         };
+        root.config = config;
 
         let needcopy = false;
 
@@ -63,31 +73,37 @@ Item {
 
         boardgameSettings.configName = boardgameName;
         boardgameSettings.gameModeName = gameMode;
-        boardgameSettings.config = config;
+        // boardgameSettings.config = config;
         boardgameSettings.needcopy = needcopy;
         boardgameSettings.loadSettingsUI(boardgameSettingsData);
 
         gameModeSettings.configName = `${boardgameName}:${gameMode}`;
         gameModeSettings.gameModeName = gameMode;
-        gameModeSettings.config = config;
+        // gameModeSettings.config = config;
         gameModeSettings.needcopy = needcopy;
         gameModeSettings.loadSettingsUI(gameSettingsData);
+
+        root.updateFeasible();
       }
     }
     LuaSettingsPage {
       id: boardgameSettings
       isBoardgame: true
+      config: root.config
       onSettingsUpdated: {
         boardgameSettings.updateSettingsUI();
         gameModeSettings.updateSettingsUI();
+        root.updateFeasible();
       }
     }
     LuaSettingsPage {
       id: gameModeSettings
       isBoardgame: false
+      config: root.config
       onSettingsUpdated: {
         boardgameSettings.updateSettingsUI();
         gameModeSettings.updateSettingsUI();
+        root.updateFeasible();
       }
     }
     Item {
@@ -113,10 +129,10 @@ Item {
       // anchors.rightMargin: 8
       spacing: 16
       W.ButtonContent {
+        id: okButton
         Layout.fillWidth: true
         Layout.preferredHeight: 40
         text: Lua.tr("OK")
-        enabled: Lua.evaluate(`Fk.game_modes['${Config.preferedMode}'] ~= nil`)
         onClicked: {
           Config.saveConf();
           root.finish();
@@ -180,5 +196,12 @@ Item {
         }
       }
     }
+  }
+
+  function updateFeasible() {
+    okButton.enabled = !!Lua.fn(`function(modeName, settings)
+      local mode = Fk.game_modes[modeName]
+      return mode and mode:feasible(settings)
+    end`)(gameModeSelectPage.gameMode, boardgameSettings.config)
   }
 }

@@ -87,6 +87,14 @@ function GameMode:countInFunc(room)
   return true
 end
 
+-- 判断是否允许点确定按钮创房间。
+function GameMode:feasible(settings)
+  return true
+end
+
+-- 以下大多是三国杀特有的
+------------------------------
+
 -- 决定初始牌堆以及初始游戏外区域的函数
 -- 需要返回两个数组，一个是牌堆，一个是游戏外（void）
 function GameMode:buildDrawPile()

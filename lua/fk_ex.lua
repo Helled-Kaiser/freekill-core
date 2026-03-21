@@ -309,6 +309,7 @@ end
 ---@field public winner_getter? fun(self: GameMode, victim: ServerPlayer): string @ 在死亡流程中用于判断是否结束游戏，并输出胜利者身份
 ---@field public surrender_func? fun(self: GameMode, playedTime: number): table
 ---@field public is_counted? fun(self: GameMode, room: Room): boolean @ 是否计入胜率统计
+---@field public feasible? fun(self: GameMode, settings: any): boolean @ 是否允许创房间
 ---@field public get_adjusted? fun(self: GameMode, player: ServerPlayer): table @ 调整玩家初始属性
 ---@field public reward_punish? fun(self: GameMode, victim: ServerPlayer, killer?: ServerPlayer) @ 死亡奖惩
 ---@field public friend_enemy_judge? fun(self: GameMode, targetOne: ServerPlayer | Player, targetTwo: ServerPlayer | Player): boolean? @ 敌友判断
@@ -343,6 +344,10 @@ function fk.CreateGameMode(spec)
   if spec.is_counted then
     assert(type(spec.is_counted) == "function")
     ret.countInFunc = spec.is_counted
+  end
+  if spec.feasible then
+    assert(type(spec.feasible) == "function")
+    ret.feasible = spec.feasible
   end
   if spec.get_adjusted then
     assert(type(spec.get_adjusted) == "function")

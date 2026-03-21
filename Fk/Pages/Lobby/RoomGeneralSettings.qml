@@ -7,12 +7,18 @@ import Fk
 import Fk.Widgets as W
 
 Item {
+  id: root
+
   width: 600
   height: 800
+
+  required property var config
 
   readonly property alias roomName: roomName.text
   readonly property alias playerNum: playerNum.value
   readonly property alias roomPassword: roomPassword.text
+
+  signal settingsUpdated()
 
   W.PreferencePage {
     id: prefPage
@@ -45,6 +51,8 @@ Item {
 
         onValueChanged: {
           Config.preferedPlayerNum = value;
+          root.config.playerNum = value;
+          root.settingsUpdated();
         }
       }
       W.SpinRow {
@@ -56,6 +64,8 @@ Item {
 
         onValueChanged: {
           Config.preferredTimeout = value;
+          root.config.timeout = value;
+          root.settingsUpdated();
         }
       }
     }
