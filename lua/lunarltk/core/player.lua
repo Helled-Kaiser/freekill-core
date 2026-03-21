@@ -1698,11 +1698,13 @@ end
 ---@return boolean
 function Player:roleVisible(target)
   local room = Fk:currentRoom()
-  local status_skills = room.status_skills[VisibilitySkill] or Util.DummyTable
-  for _, skill in ipairs(status_skills) do
-    local f = skill:roleVisible(self, target)
-    if f ~= nil then
-      return f
+  if not (room.observing --[[ and not room:getSettings("enableObserverViewCard")]] ) then
+    local status_skills = room.status_skills[VisibilitySkill] or Util.DummyTable
+    for _, skill in ipairs(status_skills) do
+      local f = skill:roleVisible(self, target)
+      if f ~= nil then
+        return f
+      end
     end
   end
 
