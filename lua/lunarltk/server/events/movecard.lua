@@ -51,43 +51,52 @@ function MoveCards:main()
   local new_data = {}
   for _, data in ipairs(moveCardsData) do
     local new_move = {}
-    if #data.moveInfo > 0 and data.toArea ~= Card.Void then
+    if #data.moveInfo > 0 then
       local orig_info, new_info, destruct_ids = {}, {}, {}
       for i = 1, #data.moveInfo do
         local info = data.moveInfo[i]
-        local will_destruct = false
-        local card = Fk:getCardById(info.cardId)
-        if card:getMark(MarkEnum.DestructIntoDiscard) ~= 0 and data.toArea == Card.DiscardPile then
-          will_destruct = true
-        end
-        if card:getMark(MarkEnum.DestructOutMyEquip) ~= 0 and info.fromArea == Card.PlayerEquip then
-          will_destruct = info.fromArea == Card.PlayerEquip
-        end
-        if card:getMark(MarkEnum.DestructOutEquip) ~= 0 and
-          ((info.fromArea == Card.PlayerEquip or info.fromArea == Card.Processing) and
-          data.toArea ~= Card.PlayerEquip and data.toArea ~= Card.Processing) then
-          will_destruct = true
-        end
-        if will_destruct then
-          room:setCardMark(card, MarkEnum.DestructIntoDiscard, 0)
-          room:setCardMark(card, MarkEnum.DestructOutMyEquip, 0)
-          room:setCardMark(card, MarkEnum.DestructOutEquip, 0)
-          table.insert(destruct_ids, info.cardId)
-          table.insert(new_info, info)
-        else
-          table.insert(orig_info, info)
+        --若卡牌不在原区域，则不处理此moveInfo（防止有技能在fk.BeforeCardsMove时插结导致发生错误移动）
+        if room:getCardArea(info.cardId) == info.fromArea and room:getCardOwner(info.cardId) == data.from then
+          --处理MarkEnum.DestructCards系列标记（离开/移至XX区域时销毁）
+          if data.toArea ~= Card.Void then
+            local will_destruct = false
+            local card = Fk:getCardById(info.cardId, true) --判断实体卡的mark不需要考虑filterSkill
+            if card:getMark(MarkEnum.DestructIntoDiscard) ~= 0 and data.toArea == Card.DiscardPile then
+              will_destruct = true
+            end
+            if card:getMark(MarkEnum.DestructOutMyEquip) ~= 0 and info.fromArea == Card.PlayerEquip then
+              will_destruct = info.fromArea == Card.PlayerEquip
+            end
+            if card:getMark(MarkEnum.DestructOutEquip) ~= 0 and
+              ((info.fromArea == Card.PlayerEquip or info.fromArea == Card.Processing) and
+              data.toArea ~= Card.PlayerEquip and data.toArea ~= Card.Processing) then
+              will_destruct = true
+            end
+            if will_destruct then
+              room:setCardMark(card, MarkEnum.DestructIntoDiscard, 0)
+              room:setCardMark(card, MarkEnum.DestructOutMyEquip, 0)
+              room:setCardMark(card, MarkEnum.DestructOutEquip, 0)
+              table.insert(destruct_ids, info.cardId)
+              table.insert(new_info, info)
+            else
+              table.insert(orig_info, info)
+            end
+          else
+            table.insert(orig_info, info)
+          end
         end
       end
       data.moveInfo = orig_info
       if #new_info > 0 then
-        new_move = {
+        --销毁的子移动应当继承原data的信息的，只改变目标区域为Card.Void
+        new_move = { ---@type MoveCardsDataSpec
           moveInfo = new_info,
           from = data.from,
           to = nil,
           toArea = Card.Void,
-          moveReason = fk.ReasonJustMove,
-          proposer = nil,
-          skillName = nil,
+          moveReason = data.moveReason,
+          proposer = data.proposer,
+          skillName = data.skillName,
           moveVisible = true,
         }
       end
