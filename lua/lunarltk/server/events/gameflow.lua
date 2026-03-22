@@ -115,8 +115,10 @@ function DrawInitial:main()
     end
     if draw_data.num > 0 then
       draw_data.cards = drawInit(room, player, draw_data.num, luck_data[player.id].fix_ids)
-      luck_data[player.id].cards = draw_data.cards
+    else
+      draw_data.cards = Util.DummyTable
     end
+    luck_data[player.id].cards = draw_data.cards
   end
 
   if room:getSettings('luckTime') <= 0 then
