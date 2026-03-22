@@ -96,6 +96,8 @@ gameRule:addEffect(fk.GameOverJudge, {
   priority = 0,
   can_trigger = can_trigger,
   on_trigger = function(self, event, target, player, data)
+    if player.rest > 0 then return end
+
     local room = player.room
     if room:getTag("SkipGameRule") then
       room:setTag("SkipGameRule", false)
