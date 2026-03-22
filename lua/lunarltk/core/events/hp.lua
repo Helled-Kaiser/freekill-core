@@ -220,5 +220,5 @@ fk.MaxHpChanged = MaxHpChangedEvent:subclass("fk.MaxHpChanged")
 ---  data: TrigSkelSpec<MaxHpChangedTrigFunc>, attr: TrigSkelAttribute?): SkillSkeleton
 
 function DamageEvent:breakCheck()
-  return self.data.damage < 1 or self.data.prevented
+  return not self:isInstanceOf(fk.DamageFinished) and (self.data.damage < 1 or self.data.prevented)
 end
