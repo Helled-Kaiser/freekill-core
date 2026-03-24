@@ -996,7 +996,6 @@ function Card:setVSPattern(skillName, player, pattern)
               m.number = e_numbers
             end
           end
-          table.insert(matchers, m)
         end
       end
       pattern = tostring(exp)
