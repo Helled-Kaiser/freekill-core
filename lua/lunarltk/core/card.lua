@@ -908,8 +908,9 @@ function Card:setVSPattern(skillName, player, pattern)
         self:addSubcards(vs.subcards)
         return
       end
-      local exp = Exppattern:Parse(skill.pattern or ".")
-      local matchers = {}
+      --一些只在出牌阶段使用的ViewAsSkill未定义skill.pattern，其默认值为""，需视作"."
+      --FIXME: 总感觉这块逻辑有问题……
+      local exp = Exppattern:Parse((skill.pattern == "") and "." or skill.pattern)
       for _, m in ipairs(exp.matchers) do
         if (m.name == nil or table.contains(m.name, self.name)) and
             (m.trueName == nil or table.contains(m.trueName, self.trueName)) then
