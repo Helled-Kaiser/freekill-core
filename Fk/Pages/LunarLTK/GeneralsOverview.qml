@@ -406,7 +406,7 @@ W.PageBase {
     height: Config.winHeight * 0.8
     anchors.centerIn: parent
     background: Rectangle {
-      color: "#EEEEEEEE"
+      color: "#F2EEEEEE"
       radius: 5
       border.color: "#A6967A"
       border.width: 1

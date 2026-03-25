@@ -23,173 +23,14 @@ Item {
   signal changeGeneralDetailInside(string to_general)
 
   onGeneralChanged: {
-    generalText.clear();
-    generalText.clearSavedText();
     root.updateGeneral();
     isFavor = Config.favoriteGenerals.includes(general);
-  }
-
-  function addSpecialSkillAudio(skill) {
-    const gdata = Ltk.getGeneralData(general);
-    const extension = gdata.extension;
-    let ret = false;
-    for (let i = 0; i < 999; i++) {
-      const fname = SkinBank.getAudioRealPath(skill + "_" + general+(i !== 0 ? i.toString() : ""), extension, "skill");
-
-      if (fname) {
-        ret = true;
-        audioModel.append({ name: skill, idx: i, specific: true });
-      } else {
-        if (i > 0) break;
-      }
-    }
-    return ret;
-  }
-
-  function addSkillAudio(skill) {
-    if (addSpecialSkillAudio(skill)) return;
-    const skilldata = Ltk.getSkillData(skill);
-    if (!skilldata) return;
-    const extension = skilldata.extension;
-    for (let i = 0; i < 999; i++) {
-      const fname = SkinBank.getAudioRealPath(skill +(i !== 0 ? i.toString() : ""), extension, "skill");
-
-      if (fname) {
-        audioModel.append({ name: skill, idx: i, specific: false});
-      } else {
-        if (i > 0) break;
-      }
-    }
-  }
-
-  function findWinAudio(general) {
-    const extension = Ltk.getGeneralData(general).extension;
-    const fname = SkinBank.getAudioRealPath(general, extension, "win");
-    audioWin.visible = !!fname;
-  }
-
-  function findDeathAudio(general) {
-    const extension = Ltk.getGeneralData(general).extension;
-    const fname = SkinBank.getAudioRealPath(general, extension, "death");
-    audioDeath.visible = !!fname;
+    detailSwipeView.currentItem?.item?.update()
   }
 
   function updateGeneral() {
     detailGeneralCard.name = general;
     //detailFlickable.contentY = 0; // 重置滚动条
-    const data = Ltk.getGeneralDetail(general);
-    generalText.clear();
-    generalText.clearSavedText();
-    audioModel.clear();
-
-    if (data.headnote !== "") generalText.append("<font color=\"lightslategrey\">" + Lua.tr(data.headnote) + "</font>");
-
-    if (data.companions.length > 0){
-      let ret = "<font color=\"slategrey\"><b>" + Lua.tr("Companions") + "</b>: ";
-      ret += data.companions.map(Lua.tr).join(" ");
-      generalText.append(ret);
-    }
-
-    const skillnamecss = `
-    <style>
-    .skill-name {
-      font-size: 19px;
-      font-weight: bold;
-    }
-    </style>
-    `;
-
-    for (const t of data.skill) {
-      Qt.callLater(() => {
-        if (!t.name.startsWith('#')) {
-          generalText.append((`${skillnamecss}<font ${t.is_related_skill ? 'color="purple"' : ''} class='skill-name'><b>`) + Lua.tr(t.name) +
-          "</b></font> " + `${t.is_related_skill ? '<font color="purple">' : ''}${t.description}${t.is_related_skill ? '</font>' : ''}`);
-
-          addSkillAudio(t.name);
-        }
-      });
-    }
-
-    Qt.callLater(() => {
-      findWinAudio(general);
-      findDeathAudio(general);
-    });
-
-    Qt.callLater(() => {
-      if (data.endnote !== "") {
-        generalText.append("<font color=\"lightslategrey\">" + Lua.tr(data.endnote) + "</font>");
-      }
-    });
-
-    otherText.clear();
-    Qt.callLater(() => {
-      const descLen = generalText.length;
-      let descLenComment;
-      if (descLen < 60) {
-        descLenComment = "<font color='darkgreen'>惜墨如金 (非常短)</font>"
-      } else if (descLen < 80) {
-        descLenComment = "<font color='mediumseagreen'>短小精悍 (短)</font>"
-      } else if (descLen < 115) {
-        descLenComment = "<font color='lightseagreen'>简明扼要 (较短)</font>"
-      } else if (descLen < 160) {
-        descLenComment = "<font color='steelblue'>恰到好处 (适中)</font>"
-      } else if (descLen < 210) {
-        descLenComment = "<font color='blueviolet'>下笔成文 (较长)</font>"
-      } else if (descLen < 280) {
-        descLenComment = "<font color='orangered'>洋洋洒洒 (长)</font>"
-      } else if (descLen <= 450) {
-        descLenComment = "<font color='crimson'>鸿篇巨制 (非常长)</font>"
-      } else {
-        descLenComment = "<font color='darkred'>罄竹难书 (难评)</font>"
-      }
-      otherText.append(`<font color="lightslategrey">技能描述全字符数：</font><b>${generalText.length} ~ ${descLenComment}</b><br>`);
-
-      // 写sql是吧，我觉得这样不太好
-      const addr = ClientInstance.peerAddress();
-      let query = `SELECT general, mode, role,
-      COUNT(CASE result WHEN 1 THEN 1 END) AS win,
-      COUNT(CASE result WHEN 2 THEN 1 END) AS lose,
-      COUNT(CASE result WHEN 3 THEN 1 END) AS draw,
-      COUNT() AS total
-      FROM myGameData WHERE pid = ${Self.id} AND server_addr = '${addr}' AND general = '${general}'
-      GROUP BY mode;`
-      const result = Cpp.sqlquery(query);
-
-      let allTotal = 0, allWin = 0;
-      let winRateTxt = "";
-      for (const dat of result) {
-        let { mode, total, win } = dat;
-        total = parseInt(total);
-        win = parseInt(win);
-        if (total > 0 && Lua.tr(mode) !== mode) {
-          allTotal += total;
-          allWin += win;
-          winRateTxt += `<tr><td>${Lua.tr(mode)}</td><td>${total}</td><td>${win}</td><td>${(win/total*100).toFixed(2)}%</td></tr>`
-        }
-      }
-      if (winRateTxt === '') {
-        winRateTxt = '没有出战记录<br>';
-      } else {
-        const css = `<style>
-        table {
-          border-collapse: collapse;
-          border: 2px solid rgb(140 140 140);
-        }
-
-        th, td {
-          padding: 2px 12px;
-          text-align: center;
-        }
-        </style>`;
-
-        winRateTxt = `总出战${allTotal}场 胜利${allWin}场 胜率${(allWin/allTotal*100).toFixed(2)}%`
-        + `${css}<table border="1"><tr><th>游戏模式</th><th>出战次数</th><th>胜利次数</th><th>胜率</th></tr>`
-        + winRateTxt
-        + '</table>';
-      }
-
-      otherText.append(winRateTxt);
-    });
   }
 
   function getSameNameGenerals(general) {
@@ -391,6 +232,510 @@ Item {
     }
   }
 
+  // TODO: 下面都是小页面的Component，UI重构合并后再拆分到单独qml文件
+  Component {
+    id: skillTextComponent
+
+    Flickable {
+      clip: true
+      contentHeight: generalText.height
+      TextEdit {
+        id: generalText
+        width: parent.width - 4
+        x: 2
+
+        property var savedtext: []
+        function clearSavedText() {
+          savedtext = [];
+        }
+        // Layout.fillWidth: true
+        readOnly: true
+        selectByKeyboard: true
+        selectByMouse: false
+        wrapMode: TextEdit.WordWrap
+        textFormat: TextEdit.RichText
+        font.pixelSize: 18
+        onLinkActivated: (link) => {
+          if (link === "back") {
+            text = savedtext.pop();
+          } else {
+            savedtext.push(text);
+            text = '<a href="back">' + Lua.tr("Click to back") + '</a><br>' + Lua.tr(link);
+          }
+        }
+      }
+
+      function update() {
+        const general = root.general;
+        const data = Ltk.getGeneralDetail(general);
+        generalText.clear();
+        generalText.clearSavedText();
+
+        if (data.headnote !== "") generalText.append("<font color=\"lightslategrey\">" + Lua.tr(data.headnote) + "</font>");
+
+        if (data.companions.length > 0){
+          let ret = "<font color=\"slategrey\"><b>" + Lua.tr("Companions") + "</b>: ";
+          ret += data.companions.map(Lua.tr).join(" ");
+          generalText.append(ret);
+        }
+
+
+        const skillnamecss = `
+        <style>
+        .skill-name {
+          font-size: 19px;
+          font-weight: bold;
+        }
+        </style>
+        `;
+
+        for (const t of data.skill) {
+          if (!t.name.startsWith('#')) {
+            generalText.append((`${skillnamecss}<font ${t.is_related_skill ? 'color="purple"' : ''} class='skill-name'><b>`) + Lua.tr(t.name) +
+            "</b></font> " + `${t.is_related_skill ? '<font color="purple">' : ''}${t.description}${t.is_related_skill ? '</font>' : ''}`);
+          }
+        }
+
+        if (data.endnote !== "") {
+          generalText.append("<font color=\"lightslategrey\">" + Lua.tr(data.endnote) + "</font>");
+        }
+      }
+
+      Component.onCompleted: update();
+    }
+  }
+
+  Component {
+    id: skillAudioComponent
+
+    Flickable {
+      clip: true
+      contentHeight: audioLayout.height
+      ColumnLayout {
+        id: audioLayout
+        width: parent.width - 4
+        x: 2
+
+        GridLayout {
+          Layout.fillWidth: true
+          columns: 2
+          Repeater {
+            model: ListModel {
+              id: audioModel
+            }
+            delegate: skillAudioBtn
+          }
+        }
+
+        Win.Button {
+          id: audioWin
+          Layout.fillWidth: true
+          contentItem: Column {
+            Text {
+              // Layout.fillWidth: true
+              text: Lua.tr("Win audio")
+              font.bold: true
+              font.pixelSize: 14
+            }
+            Text {
+              // Layout.fillWidth: true
+              text: {
+                const orig = "!" + root.general;
+                const tr = Lua.tr(orig);
+                if (tr === orig) {
+                  return "";
+                }
+                return tr;
+              }
+              wrapMode: Text.WordWrap
+            }
+          }
+
+          onClicked: {
+            const general = root.general
+            const extension = Ltk.getGeneralData(general).extension;
+            const path = SkinBank.getAudio(general, extension, "win");
+            if (path !== undefined) {
+              Backend.playSound(path);
+            }
+          }
+
+          onPressAndHold: {
+            Backend.copyToClipboard("$!" + root.general);
+            App.showToast(Lua.tr("Audio Code Copy Success"));
+          }
+
+          ToolButton {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 32
+            visible: parent.hovered
+            text: "⋮"
+            onClicked: {
+              if (winAudioMenu.visible){
+                winAudioMenu.close();
+              } else {
+                winAudioMenu.open();
+              }
+            }
+            Menu {
+              id: winAudioMenu
+              MenuItem {
+                text: Lua.tr("Copy Audio Code")
+                onTriggered: {
+                  Backend.copyToClipboard("$~" + root.general);
+                  App.showToast(Lua.tr("Audio Code Copy Success"));
+                }
+              }
+              MenuItem {
+                text: Lua.tr("Copy Audio Text")
+                onTriggered: {
+                  Backend.copyToClipboard(Lua.tr("~" + root.general));
+                  App.showToast(Lua.tr("Audio Text Copy Success"));
+                }
+              }
+            }
+          }
+        }
+
+        Win.Button {
+          id: audioDeath
+          Layout.fillWidth: true
+          contentItem: Column {
+            Text {
+              Layout.fillWidth: true
+              text: Lua.tr("Death audio")
+              font.bold: true
+              font.pixelSize: 14
+            }
+            Text {
+              Layout.fillWidth: true
+              text: {
+                const orig = "~" + root.general;
+                const tr = Lua.tr(orig);
+                if (tr === orig) {
+                  return "";
+                }
+                return tr;
+              }
+              wrapMode: Text.WordWrap
+            }
+          }
+
+          onClicked: {
+            const general = root.general
+            const extension = Ltk.getGeneralData(general).extension;
+            const path = SkinBank.getAudio(general, extension, "death");
+            if (path !== undefined) {
+              Backend.playSound(path);
+            }
+          }
+
+          onPressAndHold: {
+            Backend.copyToClipboard("$~" + root.general);
+            App.showToast(Lua.tr("Audio Code Copy Success"));
+          }
+
+          ToolButton {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            Layout.preferredWidth: 32
+            Layout.preferredHeight: 32
+            visible: parent.hovered
+            text: "⋮"
+            onClicked: {
+              if (deathAudioMenu.visible){
+                deathAudioMenu.close();
+              } else {
+                deathAudioMenu.open();
+              }
+            }
+            Menu {
+              id: deathAudioMenu
+              MenuItem {
+                text: Lua.tr("Copy Audio Code")
+                onTriggered: {
+                  Backend.copyToClipboard("$~" + root.general);
+                  App.showToast(Lua.tr("Audio Code Copy Success"));
+                }
+              }
+              MenuItem {
+                text: Lua.tr("Copy Audio Text")
+                onTriggered: {
+                  Backend.copyToClipboard(Lua.tr("~" + root.general));
+                  App.showToast(Lua.tr("Audio Text Copy Success"));
+                }
+              }
+            }
+          }
+        }
+      }
+
+      function addSpecialSkillAudio(skill) {
+        const gdata = Ltk.getGeneralData(general);
+        const extension = gdata.extension;
+        let ret = false;
+        for (let i = 0; i < 999; i++) {
+          const fname = SkinBank.getAudioRealPath(skill + "_" + general+(i !== 0 ? i.toString() : ""), extension, "skill");
+
+          if (fname) {
+            ret = true;
+            audioModel.append({ name: skill, idx: i, specific: true });
+          } else {
+            if (i > 0) break;
+          }
+        }
+        return ret;
+      }
+
+      function addSkillAudio(skill) {
+        if (addSpecialSkillAudio(skill)) return;
+        const skilldata = Ltk.getSkillData(skill);
+        if (!skilldata) return;
+        const extension = skilldata.extension;
+        for (let i = 0; i < 999; i++) {
+          const fname = SkinBank.getAudioRealPath(skill +(i !== 0 ? i.toString() : ""), extension, "skill");
+
+          if (fname) {
+            audioModel.append({ name: skill, idx: i, specific: false});
+          } else {
+            if (i > 0) break;
+          }
+        }
+      }
+
+      function findWinAudio(general) {
+        const extension = Ltk.getGeneralData(general).extension;
+        const fname = SkinBank.getAudioRealPath(general, extension, "win");
+        audioWin.visible = !!fname;
+      }
+
+      function findDeathAudio(general) {
+        const extension = Ltk.getGeneralData(general).extension;
+        const fname = SkinBank.getAudioRealPath(general, extension, "death");
+        audioDeath.visible = !!fname;
+      }
+
+
+      function update() {
+        const data = Ltk.getGeneralDetail(general);
+        audioModel.clear();
+
+        for (const t of data.skill) {
+          if (!t.name.startsWith('#')) {
+            addSkillAudio(t.name);
+          }
+        }
+
+        findWinAudio(general);
+        findDeathAudio(general);
+      }
+
+      Component.onCompleted: update();
+    }
+  }
+
+  Component {
+    id: statisticsComponent
+
+    Flickable {
+      clip: true
+      contentHeight: otherText.height
+      TextEdit {
+        id: otherText
+        width: parent.width - 4
+        x: 2
+
+        readOnly: true
+        selectByKeyboard: true
+        selectByMouse: false
+        wrapMode: TextEdit.WordWrap
+        textFormat: TextEdit.RichText
+        font.pixelSize: 18
+      }
+
+      function update() {
+        otherText.clear();
+        const descLen = Lua.fn(`function(general)
+        local allDesc = table.map(Fk.generals[general].all_skills, function(s)
+        return Fk:translate(s[1]) + Fk:translate(":" .. s[1])
+        end)
+        local ret = 0
+        for _, s in ipairs(allDesc) do
+        ret = ret + s:len()
+        end
+        return ret
+        end`)(general);
+        let descLenComment;
+        if (descLen < 60) {
+          descLenComment = "<font color='darkgreen'>惜墨如金 (非常短)</font>"
+        } else if (descLen < 80) {
+          descLenComment = "<font color='mediumseagreen'>短小精悍 (短)</font>"
+        } else if (descLen < 115) {
+          descLenComment = "<font color='lightseagreen'>简明扼要 (较短)</font>"
+        } else if (descLen < 160) {
+          descLenComment = "<font color='steelblue'>恰到好处 (适中)</font>"
+        } else if (descLen < 210) {
+          descLenComment = "<font color='blueviolet'>下笔成文 (较长)</font>"
+        } else if (descLen < 280) {
+          descLenComment = "<font color='orangered'>洋洋洒洒 (长)</font>"
+        } else if (descLen <= 450) {
+          descLenComment = "<font color='crimson'>鸿篇巨制 (非常长)</font>"
+        } else {
+          descLenComment = "<font color='darkred'>罄竹难书 (难评)</font>"
+        }
+        otherText.append(`<font color="lightslategrey">技能描述全字符数：</font><b>${descLen} ~ ${descLenComment}</b><br>`);
+
+        // 写sql是吧，我觉得这样不太好
+        const addr = ClientInstance.peerAddress();
+        let query = `SELECT general, mode, role,
+        COUNT(CASE result WHEN 1 THEN 1 END) AS win,
+        COUNT(CASE result WHEN 2 THEN 1 END) AS lose,
+        COUNT(CASE result WHEN 3 THEN 1 END) AS draw,
+        COUNT() AS total
+        FROM myGameData WHERE pid = ${Self.id} AND server_addr = '${addr}' AND general = '${general}'
+        GROUP BY mode;`
+        const result = Cpp.sqlquery(query);
+
+        let allTotal = 0, allWin = 0;
+        let winRateTxt = "";
+        for (const dat of result) {
+          let { mode, total, win } = dat;
+          total = parseInt(total);
+          win = parseInt(win);
+          if (total > 0 && Lua.tr(mode) !== mode) {
+            allTotal += total;
+            allWin += win;
+            winRateTxt += `<tr><td>${Lua.tr(mode)}</td><td>${total}</td><td>${win}</td><td>${(win/total*100).toFixed(2)}%</td></tr>`
+          }
+        }
+        if (winRateTxt === '') {
+          winRateTxt = '没有出战记录<br>';
+        } else {
+          const css = `<style>
+          table {
+            border-collapse: collapse;
+            border: 2px solid rgb(140 140 140);
+          }
+
+          th, td {
+            padding: 2px 12px;
+            text-align: center;
+          }
+          </style>`;
+
+          winRateTxt = `总出战${allTotal}场 胜利${allWin}场 胜率${(allWin/allTotal*100).toFixed(2)}%`
+          + `${css}<table border="1"><tr><th>游戏模式</th><th>出战次数</th><th>胜利次数</th><th>胜率</th></tr>`
+          + winRateTxt
+          + '</table>';
+        }
+
+        otherText.append(winRateTxt);
+      }
+
+      Component.onCompleted: update();
+    }
+  }
+
+  // 这个页面加载的速度非常慢！
+  Component {
+    id: sameGeneralsComponent
+
+    Flickable {
+      clip: true
+      contentHeight: otherSameLayout.height
+      GridLayout {
+        id: otherSameLayout
+        columns: 5
+        columnSpacing: 5
+        rowSpacing: 5
+        Repeater {
+          model: root.getSameNameGenerals(root.general)
+          delegate: GeneralCardItem {
+            id: sameNameGeneralCard
+            name: modelData
+            scale: 1; transformOrigin: Item.TopLeft
+
+            onClicked: {
+              drawerBar.currentIndex = 0;
+              root.changeGeneralDetailInside(modelData)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 这个页面加载的速度很慢！
+  Component {
+    id: sourceCodeComponent
+
+    Flickable {
+      clip: true
+      contentHeight: srcList.height
+      ColumnLayout {
+        id: srcList
+        width: parent.width - 4
+        x: 2
+        Repeater {
+          model: root.general ? Lua.evaluate(`table.map(Fk.generals["${root.general}"].all_skills, function(e) return e[1] end)`) : []
+
+          TextEdit {
+            id: srcArea
+            required property string modelData
+            font.pixelSize: 12
+            Layout.fillWidth: true
+            text: {
+              const skill = modelData;
+              let ret = "--------------------------------------------\n" +
+              `--- 技能名：${Lua.tr(skill)}\n` +
+              "--- 源码：";
+
+              const path = Lua.evaluate(`Fk.skill_skels["${skill}"].file_path`);
+              if (!path) {
+                ret += "(不可用)\n" + "--------------------------------------------\n\n";
+                return ret;
+              }
+              // 为什么lua那边给读文件留了个口子
+              const readFile = Lua.fn(`function(path)
+              local ret = ""
+              for line in io.lines(path) do
+              ret = ret .. line .. "\\n"
+              end
+              return ret
+              end`);
+              return ret +
+              `${path}\n` + "--------------------------------------------\n\n"
+              + readFile(path) + "\n";
+            }
+            font.family: "Consolas"
+            readOnly: true
+            wrapMode: Text.WrapAnywhere
+            selectByKeyboard: true
+            selectByMouse: false
+            textFormat: Text.PlainText
+
+            Component.onCompleted: {
+              // 就目前而言只有使用Kde桌面的Linux用户才能体验到语法高亮功能！
+              // 不过那个语法高亮库只依赖Qt库，理论上可以编译到游戏中，但是应该会很麻烦
+              const component = Qt.createComponent("org.kde.syntaxhighlighting", "SyntaxHighlighter");
+              if (component.status !== Component.Ready) {
+                console.warn("SyntaxHighlighter is not installed, syntax highlight feature disabled.");
+                return;
+              }
+
+              const highlighter = component.createObject(srcArea, {
+                textEdit: srcArea,
+                definition: "Lua",
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
   ColumnLayout {
     width: parent.width - 40 - generalInfo.width
     height: parent.height - 10
@@ -399,246 +744,37 @@ Item {
     y: 10
 
     SwipeView {
+      id: detailSwipeView
       Layout.fillWidth: true
       Layout.fillHeight: true
       interactive: false
       currentIndex: drawerBar.currentIndex
       clip: true
 
-      Flickable {
-        clip: true
-        contentHeight: generalText.height
-        TextEdit {
-          id: generalText
-          width: parent.width - 4
-          x: 2
-
-          property var savedtext: []
-          function clearSavedText() {
-            savedtext = [];
-          }
-          // Layout.fillWidth: true
-          readOnly: true
-          selectByKeyboard: true
-          selectByMouse: false
-          wrapMode: TextEdit.WordWrap
-          textFormat: TextEdit.RichText
-          font.pixelSize: 18
-          onLinkActivated: (link) => {
-            if (link === "back") {
-              text = savedtext.pop();
-            } else {
-              savedtext.push(text);
-              text = '<a href="back">' + Lua.tr("Click to back") + '</a><br>' + Lua.tr(link);
-            }
-          }
-        }
+      // 出于性能考虑，改为Loader延迟加载
+      Loader {
+        active: SwipeView.isCurrentItem
+        sourceComponent: skillTextComponent
       }
 
-      Flickable {
-        clip: true
-        contentHeight: audioLayout.height
-        ColumnLayout {
-          id: audioLayout
-          width: parent.width - 4
-          x: 2
-
-          GridLayout {
-            Layout.fillWidth: true
-            columns: 2
-            Repeater {
-              model: ListModel {
-                id: audioModel
-              }
-              delegate: skillAudioBtn
-            }
-          }
-
-          Win.Button {
-            id: audioWin
-            Layout.fillWidth: true
-            contentItem: Column {
-              Text {
-                // Layout.fillWidth: true
-                text: Lua.tr("Win audio")
-                font.bold: true
-                font.pixelSize: 14
-              }
-              Text {
-                // Layout.fillWidth: true
-                text: {
-                  const orig = "!" + root.general;
-                  const tr = Lua.tr(orig);
-                  if (tr === orig) {
-                    return "";
-                  }
-                  return tr;
-                }
-                wrapMode: Text.WordWrap
-              }
-            }
-
-            onClicked: {
-              const general = root.general
-              const extension = Ltk.getGeneralData(general).extension;
-              const path = SkinBank.getAudio(general, extension, "win");
-              if (path !== undefined) {
-                Backend.playSound(path);
-              }
-            }
-
-            onPressAndHold: {
-              Backend.copyToClipboard("$!" + root.general);
-              App.showToast(Lua.tr("Audio Code Copy Success"));
-            }
-
-            ToolButton {
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              Layout.preferredWidth: 32
-              Layout.preferredHeight: 32
-              visible: parent.hovered
-              text: "⋮"
-              onClicked: {
-                if (winAudioMenu.visible){
-                  winAudioMenu.close();
-                } else {
-                  winAudioMenu.open();
-                }
-              }
-              Menu {
-                id: winAudioMenu
-                MenuItem {
-                  text: Lua.tr("Copy Audio Code")
-                  onTriggered: {
-                    Backend.copyToClipboard("$~" + root.general);
-                    App.showToast(Lua.tr("Audio Code Copy Success"));
-                  }
-                }
-                MenuItem {
-                  text: Lua.tr("Copy Audio Text")
-                  onTriggered: {
-                    Backend.copyToClipboard(Lua.tr("~" + root.general));
-                    App.showToast(Lua.tr("Audio Text Copy Success"));
-                  }
-                }
-              }
-            }
-          }
-
-          Win.Button {
-            id: audioDeath
-            Layout.fillWidth: true
-            contentItem: Column {
-              Text {
-                Layout.fillWidth: true
-                text: Lua.tr("Death audio")
-                font.bold: true
-                font.pixelSize: 14
-              }
-              Text {
-                Layout.fillWidth: true
-                text: {
-                  const orig = "~" + root.general;
-                  const tr = Lua.tr(orig);
-                  if (tr === orig) {
-                    return "";
-                  }
-                  return tr;
-                }
-                wrapMode: Text.WordWrap
-              }
-            }
-
-            onClicked: {
-              const general = root.general
-              const extension = Ltk.getGeneralData(general).extension;
-              const path = SkinBank.getAudio(general, extension, "death");
-              if (path !== undefined) {
-                Backend.playSound(path);
-              }
-            }
-
-            onPressAndHold: {
-              Backend.copyToClipboard("$~" + root.general);
-              App.showToast(Lua.tr("Audio Code Copy Success"));
-            }
-
-            ToolButton {
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              Layout.preferredWidth: 32
-              Layout.preferredHeight: 32
-              visible: parent.hovered
-              text: "⋮"
-              onClicked: {
-                if (deathAudioMenu.visible){
-                  deathAudioMenu.close();
-                } else {
-                  deathAudioMenu.open();
-                }
-              }
-              Menu {
-                id: deathAudioMenu
-                MenuItem {
-                  text: Lua.tr("Copy Audio Code")
-                  onTriggered: {
-                    Backend.copyToClipboard("$~" + root.general);
-                    App.showToast(Lua.tr("Audio Code Copy Success"));
-                  }
-                }
-                MenuItem {
-                  text: Lua.tr("Copy Audio Text")
-                  onTriggered: {
-                    Backend.copyToClipboard(Lua.tr("~" + root.general));
-                    App.showToast(Lua.tr("Audio Text Copy Success"));
-                  }
-                }
-              }
-            }
-          }
-        }
+      Loader {
+        active: SwipeView.isCurrentItem
+        sourceComponent: skillAudioComponent
       }
 
-      Flickable {
-        clip: true
-        contentHeight: otherText.height
-        TextEdit {
-          id: otherText
-          width: parent.width - 4
-          x: 2
-
-          readOnly: true
-          selectByKeyboard: true
-          selectByMouse: false
-          wrapMode: TextEdit.WordWrap
-          textFormat: TextEdit.RichText
-          font.pixelSize: 18
-        }
+      Loader {
+        active: SwipeView.isCurrentItem
+        sourceComponent: statisticsComponent
       }
 
-      Flickable {
-        clip: true
-        contentHeight: otherSameLayout.height
-        GridLayout {
-          id: otherSameLayout
-          columns: 5
-          columnSpacing: 5
-          rowSpacing: 5
-          Repeater {
-            model: root.getSameNameGenerals(root.general)
-            delegate: GeneralCardItem {
-              id: sameNameGeneralCard
-              name: modelData
-              scale: 1; transformOrigin: Item.TopLeft
+      Loader {
+        active: SwipeView.isCurrentItem
+        sourceComponent: sameGeneralsComponent
+      }
 
-              onClicked: {
-                drawerBar.currentIndex = 0;
-                root.changeGeneralDetailInside(modelData)
-              }
-            }
-          }
-        }
+      Loader {
+        active: SwipeView.isCurrentItem
+        sourceComponent: sourceCodeComponent
       }
     }
 
@@ -648,8 +784,9 @@ Item {
       model: [
         Lua.tr("Skill Description"),
         Lua.tr("Audio Text"),
-        Lua.tr("Statistics Overview"),
+        Lua.tr("General Statistics Overview"),
         Lua.tr("Other Same Name Generals"),
+        Lua.tr("Skill Source Code"),
       ]
     }
   }

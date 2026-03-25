@@ -113,6 +113,7 @@ function Package:loadSkillSkelsByPath(path)
     if filename:sub(-4) == ".lua" and filename ~= "init.lua" then
       local skel = Pcall(require, normalized_dir .. "." .. filename:sub(1, -5))
       if skel then
+        skel.file_path = path .. "/" .. filename
         table.insert(skels, skel)
       end
     end
