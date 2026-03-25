@@ -524,12 +524,14 @@ Item {
 
         for (const t of data.skill) {
           if (!t.name.startsWith('#')) {
-            addSkillAudio(t.name);
+            Qt.callLater(() => addSkillAudio(t.name));
           }
         }
 
-        findWinAudio(general);
-        findDeathAudio(general);
+        Qt.callLater(() => {
+          findWinAudio(general);
+          findDeathAudio(general);
+        });
       }
 
       Component.onCompleted: update();
@@ -558,14 +560,14 @@ Item {
       function update() {
         otherText.clear();
         const descLen = Lua.fn(`function(general)
-        local allDesc = table.map(Fk.generals[general].all_skills, function(s)
-        return Fk:translate(s[1]) + Fk:translate(":" .. s[1])
-        end)
-        local ret = 0
-        for _, s in ipairs(allDesc) do
-        ret = ret + s:len()
-        end
-        return ret
+          local allDesc = table.map(Fk.generals[general].all_skills, function(s)
+            return Fk:translate(s[1]) + Fk:translate(":" .. s[1])
+          end)
+          local ret = 0
+          for _, s in ipairs(allDesc) do
+            ret = ret + s:len()
+          end
+          return ret
         end`)(general);
         let descLenComment;
         if (descLen < 60) {
@@ -678,15 +680,75 @@ Item {
         id: srcList
         width: parent.width - 4
         x: 2
+        spacing: 0
+
         Repeater {
           model: root.general ? Lua.evaluate(`table.map(Fk.generals["${root.general}"].all_skills, function(e) return e[1] end)`) : []
 
-          TextEdit {
-            id: srcArea
-            required property string modelData
-            font.pixelSize: 12
+          ColumnLayout {
             Layout.fillWidth: true
-            text: {
+            required property string modelData
+            property string sourceCode
+
+            Win.Button {
+              Layout.fillWidth: true
+              text: {
+                const skill = parent.modelData;
+                const skillTr = Lua.tr(skill);
+                if (!enabled) {
+                  return skillTr + " (源码不可用)";
+                } else {
+                  if (srcArea.text === "") {
+                    return skillTr + " (点击查看源码)";
+                  } else {
+                    return skillTr + " (点击折叠)";
+                  }
+                }
+              }
+
+              enabled: {
+                const skill = parent.modelData;
+                return !!Lua.evaluate(`Fk.skill_skels["${skill}"].file_path`);
+              }
+
+              onClicked: {
+                if (srcArea.text !== "") {
+                  srcArea.text = "";
+                } else {
+                  if (!parent.sourceCode) parent.update();
+                  srcArea.text = parent.sourceCode;
+                }
+              }
+            }
+
+            TextEdit {
+              id: srcArea
+              font.pixelSize: 12
+              Layout.fillWidth: true
+              font.family: "Consolas"
+              readOnly: true
+              wrapMode: Text.WrapAnywhere
+              selectByKeyboard: true
+              selectByMouse: false
+              textFormat: Text.PlainText
+
+              Component.onCompleted: {
+                // 就目前而言只有使用Kde桌面的Linux用户才能体验到语法高亮功能！
+                // 不过那个语法高亮库只依赖Qt库，理论上可以编译到游戏中，但是应该会很麻烦
+                const component = Qt.createComponent("org.kde.syntaxhighlighting", "SyntaxHighlighter");
+                if (component.status !== Component.Ready) {
+                  console.warn("SyntaxHighlighter is not installed, syntax highlight feature disabled.");
+                  return;
+                }
+
+                const highlighter = component.createObject(srcArea, {
+                  textEdit: srcArea,
+                  definition: "Lua",
+                });
+              }
+            }
+
+            function update() {
               const skill = modelData;
               let ret = "--------------------------------------------\n" +
               `--- 技能名：${Lua.tr(skill)}\n` +
@@ -695,40 +757,20 @@ Item {
               const path = Lua.evaluate(`Fk.skill_skels["${skill}"].file_path`);
               if (!path) {
                 ret += "(不可用)\n" + "--------------------------------------------\n\n";
-                return ret;
+                sourceCode = ret;
+                return;
               }
               // 为什么lua那边给读文件留了个口子
               const readFile = Lua.fn(`function(path)
-              local ret = ""
-              for line in io.lines(path) do
-              ret = ret .. line .. "\\n"
-              end
-              return ret
+                local ret = ""
+                for line in io.lines(path) do
+                  ret = ret .. line .. "\\n"
+                end
+                return ret
               end`);
-              return ret +
+              sourceCode = ret +
               `${path}\n` + "--------------------------------------------\n\n"
               + readFile(path) + "\n";
-            }
-            font.family: "Consolas"
-            readOnly: true
-            wrapMode: Text.WrapAnywhere
-            selectByKeyboard: true
-            selectByMouse: false
-            textFormat: Text.PlainText
-
-            Component.onCompleted: {
-              // 就目前而言只有使用Kde桌面的Linux用户才能体验到语法高亮功能！
-              // 不过那个语法高亮库只依赖Qt库，理论上可以编译到游戏中，但是应该会很麻烦
-              const component = Qt.createComponent("org.kde.syntaxhighlighting", "SyntaxHighlighter");
-              if (component.status !== Component.Ready) {
-                console.warn("SyntaxHighlighter is not installed, syntax highlight feature disabled.");
-                return;
-              }
-
-              const highlighter = component.createObject(srcArea, {
-                textEdit: srcArea,
-                definition: "Lua",
-              });
             }
           }
         }

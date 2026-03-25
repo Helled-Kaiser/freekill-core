@@ -3,7 +3,11 @@ local extension = Package:new("standard")
 local prefix = "packages."
 if UsingNewCore then prefix = "packages.freekill-core." end
 
-extension:loadSkillSkels(require(prefix .. "standard.pkg.skills"))
+local path = "./packages/standard/pkg/skills"
+if UsingNewCore then
+  path = "./packages/freekill-core/standard/pkg/skills"
+end
+extension:loadSkillSkelsByPath(path)
 
 General:new(extension, "caocao", "wei", 4):addSkills { "jianxiong", "hujia" }
 General:new(extension, "simayi", "wei", 3):addSkills { "guicai", "fankui" }
