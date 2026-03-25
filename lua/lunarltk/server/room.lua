@@ -1866,6 +1866,7 @@ end
 ---@class AskToExchangeParams
 ---@field piles integer[][] @ 卡牌id列表的列表，也就是……几堆牌堆的集合
 ---@field piles_name? string[] @ 牌堆名，不足部分替换为“牌堆1、牌堆2...”
+---@field prompt? string @ 操作提示
 ---@field skill_name? string @ 烧条时显示的技能名
 
 --- 询问玩家任意交换几堆牌堆。
@@ -1874,31 +1875,13 @@ end
 ---@param params AskToExchangeParams @ 各种变量
 ---@return integer[][] @ 交换后的结果
 function Room:askToExchange(player, params)
-  local piles, customNotify = params.piles, params.skill_name
-  local command = "AskForExchange"
-  params.piles_name = params.piles_name or Util.DummyTable
-  local x = #piles - #params.piles_name
-  if x > 0 then
-    for i = 1, x, 1 do
-      table.insert(params.piles_name, Fk:translate("Pile") .. i)
-    end
-  elseif x < 0 then
-    params.piles_name = table.slice(params.piles_name, 1, #piles + 1)
-  end
-  local data = {
-    piles = piles,
-    piles_name = params.piles_name,
-  }
-
-  local req = Request:new(player, command)
-  req.focus_text = customNotify
-  req:setData(player, data)
-  local result = req:getResult(player)
-  if result ~= "" then
-    return result
-  else
-    return piles
-  end
+  return self:askToArrangeCards(player, {
+    card_map = table.connect(params.piles, params.piles_name or {}),
+    skill_name = params.skill_name or "AskForExchange",
+    prompt = params.prompt or "",
+    area_names = params.piles_name,
+    free_arrange = true,
+  })
 end
 
 --- 抽个武将
