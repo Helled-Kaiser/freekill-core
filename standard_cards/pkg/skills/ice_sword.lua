@@ -14,7 +14,7 @@ skill:addEffect(fk.DetermineDamageCaused, {
     local to = data.to
     for i = 1, 2 do
       local ptn = '.|.|.|.|.|.|' .. table.concat(table.filter(to:getCardIds('he'), function(cid)
-          return not (effect.from:cardVisible(cid) and player:prohibitDiscard(cid))
+          return not (player:cardVisible(cid) and player:prohibitDiscard(cid))
         end), ',')
       if player.dead or to.dead or (ptn == '.|.|.|.|.|.|') then break end --or to:isNude()
       local ids = room:askToChoosePatternCards(player, { target = to, flag = "he", skill_name = skill.name, min = 1, max = 1, pattern = ptn })
