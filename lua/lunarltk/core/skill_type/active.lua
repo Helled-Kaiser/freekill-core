@@ -174,7 +174,7 @@ function ActiveSkill:withinDistanceLimit(player, isattack, card, to)
     if skill:bypassDistancesCheck(player, self, card, to) then return true end
   end
 
-  return (isattack and player:inMyAttackRange(to, nil, table.connect(Card:getIdList(card), card.fake_subcards), nil, card)) or
+  return (isattack and player:inMyAttackRange(to, nil, table.connect(Card:getIdList(card), card and card.fake_subcards or {}), nil, card)) or
   ((d > 0) and (d <= self:getDistanceLimit(player, card, to))) or
   not not card:hasMark(MarkEnum.BypassDistancesLimit) or
   not not player:hasMark(MarkEnum.BypassDistancesLimit) or
